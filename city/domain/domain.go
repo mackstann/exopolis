@@ -15,6 +15,22 @@ const (
 	PowerPlant = 300
 )
 
+// Networks (implemented as graph):
+// * foodTransport (has resistance)
+// * jobTransport (has resistance)
+// * electrical (no resistance)
+//
+// Fields (implemented as heat diffusion)
+// * Air pollution
+// * Noise
+//
+// Transpo demand/traffic...
+//
+// day/night cycle with coloration... or sun visualization
+
+// level is determined by field strengths
+// e.g. formula: house level is (electricalBool x foodTransport x jobTransport x (1-pollution) x (1-noise))
+
 type Cell struct {
 	Typ CellType
 
@@ -26,20 +42,11 @@ type Cell struct {
 }
 
 type FarmCell struct {
-	productivity int
-	accessTo     struct {
-		water   int
-		workers int
-	}
+	level int
 }
 
 type HouseCell struct {
-	population int
-	accessTo   struct {
-		electricity int
-		food        int
-		work        int
-	}
+	level int
 }
 
 type PowerLineCell struct{}
@@ -52,7 +59,7 @@ type RoadCell struct{}
 
 type Row []Cell
 
-type City []Row
+type City []Row // TODO privatize some things
 
 func NewCity(size int) City {
 	city := make(City, 0, size)
