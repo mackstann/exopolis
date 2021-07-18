@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -8,6 +9,12 @@ type JobTransportNetwork struct {
 	city City
 	Grid []row
 }
+
+const (
+	influxorWeight90 float64 = 1.0
+	// because the heat transmission force reduces with the square of the distance
+	influxorWeight45 = 1.0 / 4
+)
 
 func NewJobTransportNetwork(city City) *JobTransportNetwork {
 	grid := make([]row, 0, len(city))
@@ -25,9 +32,9 @@ func NewJobTransportNetwork(city City) *JobTransportNetwork {
 			case Road:
 				ourCell.conductivity = 0.9
 			case Farm:
-				ourCell.Temperature = 1
+				ourCell.Temperature = 0.1
 			case PowerPlant:
-				ourCell.Temperature = 10
+				ourCell.Temperature = 1
 			}
 			grid[y][x] = ourCell
 		}
@@ -63,28 +70,47 @@ func (n JobTransportNetwork) Step(timeDelta time.Duration) {
 				n.cellAt(x+1, y+1),
 			}
 
+			fmt.Printf("-------\n")
 			me := n.Grid[y][x]
-			var influx float64
+			var tote float64
+			var influxors float64
 			for _, c := range cells {
-				temperatureDelta := c.Temperature - me.Temperature
-				influx += temperatureDelta * me.conductivity
+				if c.Temperature != -1 {
+					fmt.Printf("90deg influxor\n")
+					tote += c.Temperature
+					influxors += influxorWeight90
+				}
 			}
 			for _, c := range diagCells {
-				temperatureDelta := c.Temperature - me.Temperature
-				influx += temperatureDelta * me.conductivity / 4
+				if c.Temperature != -1 {
+					fmt.Printf("45deg influxor\n")
+					tote += c.Temperature / 4
+					influxors += influxorWeight45
+				}
 			}
 
-			// 1 each for right-angle neighbors, 1/4 each for diag neighbors
-			avgInflux := influx / 5
-
-			n.Grid[y][x].Temperature += avgInflux * float64(timeDelta)
+			fmt.Printf("influxors %f\n", influxors)
+			avg := tote / influxors
+			delta := avg - me.Temperature
+			// DELTA IS 0.5 but i thought it should be 0.1??????
+			if delta > 0 {
+				fmt.Printf("metemp %v delta %v cond %v\n", me.Temperature, delta, me.conductivity)
+				n.Grid[y][x].Temperature += delta * me.conductivity
+				if n.Grid[y][x].Temperature > 1 {
+					n.Grid[y][x].Temperature = 1
+				}
+				if n.Grid[y][x].Temperature < 0 {
+					n.Grid[y][x].Temperature = 0
+				}
+			}
+			fmt.Printf("-------\n")
 		}
 	}
 }
 
 func (n JobTransportNetwork) cellAt(x int, y int) cell {
 	if x < 0 || y < 0 || x >= len(n.Grid) || y >= len(n.Grid[0]) {
-		return cell{}
+		return cell{Temperature: -1, conductivity: -1}
 	}
 	return n.Grid[y][x]
 }
