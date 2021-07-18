@@ -4,20 +4,20 @@ import (
 	"time"
 )
 
-type jobTransportNetwork struct {
+type JobTransportNetwork struct {
 	city City
-	grid []row
+	Grid []row
 }
 
-func NewJobTransportNetwork(city City) {
-	grid = make([]row, 0, len(n.city))
-	for y := 0; y < len(n.city); y++ {
-		grid = append(grid, make(row, len(n.city[y])))
+func NewJobTransportNetwork(city City) *JobTransportNetwork {
+	grid := make([]row, 0, len(city))
+	for y := 0; y < len(city); y++ {
+		grid = append(grid, make(row, len(city[y])))
 	}
 
-	for y := 0; y < len(n.city); y++ {
-		for x := 0; x < len(n.city[y]); x++ {
-			c := n.city[y][x]
+	for y := 0; y < len(city); y++ {
+		for x := 0; x < len(city[y]); x++ {
+			c := city[y][x]
 			ourCell := cell{}
 			switch c.Typ {
 			case Dirt:
@@ -25,49 +25,73 @@ func NewJobTransportNetwork(city City) {
 			case Road:
 				ourCell.conductivity = 0.9
 			case Farm:
-				ourCell.heat = 1
+				ourCell.Temperature = 1
 			case PowerPlant:
-				ourCell.heat = 10
+				ourCell.Temperature = 10
 			}
 			grid[y][x] = ourCell
 		}
 	}
 
-	return &jobTransportNetwork{
-		city: City,
-		grid: grid,
+	return &JobTransportNetwork{
+		city: city,
+		Grid: grid,
 	}
 }
 
 type cell struct {
-	heat         float64
+	Temperature float64
+	// conductivity controls heat flow into this cell. Heat flow out is unrestricted.
 	conductivity float64
 }
 
 type row []cell
 
-func (n jobTransportNetwork) step(timeDelta time.Time) {
-	for y := 0; y < len(n.grid); y++ {
-		for x := 0; x < len(n.grid[y]); x++ {
-			influx := (n.influx(x-1, y) +
-				n.influx(x+1, y) +
-				n.influx(x, y-1) +
-				n.influx(x, y+1) +
-				n.influx(x-1, y-1)/4 +
-				n.influx(x-1, y+1)/4 +
-				n.influx(x+1, y-1)/4 +
-				n.influx(x+1, y+1)/4)
-			influx /= 5
-			//n.grid[y][x].heat = // combine their heat and ours, depending on our conductivity
+func (n JobTransportNetwork) Step(timeDelta time.Duration) {
+	for y := 0; y < len(n.Grid); y++ {
+		for x := 0; x < len(n.Grid[y]); x++ {
+			cells := [4]cell{
+				n.cellAt(x-1, y),
+				n.cellAt(x+1, y),
+				n.cellAt(x, y-1),
+				n.cellAt(x, y+1),
+			}
+			diagCells := [4]cell{
+				n.cellAt(x-1, y-1),
+				n.cellAt(x-1, y+1),
+				n.cellAt(x+1, y-1),
+				n.cellAt(x+1, y+1),
+			}
+
+			me := n.Grid[y][x]
+			var influx float64
+			for _, c := range cells {
+				temperatureDelta := c.Temperature - me.Temperature
+				influx += temperatureDelta * me.conductivity
+			}
+			for _, c := range diagCells {
+				temperatureDelta := c.Temperature - me.Temperature
+				influx += temperatureDelta * me.conductivity / 4
+			}
+
+			// 1 each for right-angle neighbors, 1/4 each for diag neighbors
+			avgInflux := influx / 5
+
+			n.Grid[y][x].Temperature += avgInflux * float64(timeDelta)
 		}
 	}
 }
 
-func (n jobTransportNetwork) influx(x int, y int) {
-	if x < 0 || y < 0 || x >= len(n.grid) || y >= len(n.grid[0]) {
+func (n JobTransportNetwork) cellAt(x int, y int) cell {
+	if x < 0 || y < 0 || x >= len(n.Grid) || y >= len(n.Grid[0]) {
+		return cell{}
+	}
+	return n.Grid[y][x]
+}
+
+func seriesConductivity(c1 float64, c2 float64) float64 {
+	if c1 == 0 || c2 == 0 {
 		return 0
 	}
-	cell := n.grid[y][x]
-	return cell.heat * cell.conductivity
-
+	return (c1 * c2) / (c1 + c2)
 }

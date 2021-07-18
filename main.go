@@ -1,23 +1,32 @@
 package main
 
 import (
+	"time"
+
 	"github.com/mackstann/exoplanet/city/domain"
 	"github.com/mackstann/exoplanet/city/renderer"
 )
 
 func main() {
-	city := domain.NewCity(10)
+	city := domain.NewCity(5)
+
+	// these changes don't affect the city if the network is set up before
+	city[2][2].Typ = domain.House
+	city[2][2].House = &domain.HouseCell{}
+	city[3][2].Typ = domain.Road
+	city[3][2].Road = &domain.RoadCell{}
+	city[4][2].Typ = domain.Farm
+	city[4][2].Farm = &domain.FarmCell{}
+
 	jobTransport := domain.NewJobTransportNetwork(city)
 
-	city[5][5].Typ = domain.House
-	city[5][5].House = &domain.HouseCell{}
-	city[6][5].Typ = domain.Road
-	city[6][5].Farm = &domain.RoadCell{}
-	city[7][5].Typ = domain.Farm
-	city[7][5].Farm = &domain.FarmCell{}
-	renderer.Render(city)
+	renderer.Render(city, jobTransport)
 
-	jobTransport.step()
-
-	renderer.Render(city)
+	realStep := 10 * time.Millisecond
+	gameStep := realStep / 10
+	for {
+		jobTransport.Step(gameStep)
+		renderer.Render(city, jobTransport)
+		time.Sleep(realStep)
+	}
 }
