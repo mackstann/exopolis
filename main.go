@@ -23,9 +23,8 @@ func main() {
 	renderer.Render(city, jobTransport)
 
 	realStep := 10 * time.Millisecond
-	gameStep := realStep / 10000
 	for {
-		jobTransport.Step(gameStep)
+		jobTransport.Step()
 		renderer.Render(city, jobTransport)
 		time.Sleep(realStep)
 	}
