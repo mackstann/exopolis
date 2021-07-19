@@ -25,26 +25,27 @@ func textualize(city domain.City, n *domain.JobTransportNetwork) []string {
 		rowOutput := ""
 		for x, cell := range row {
 			nCell := n.Grid[y][x]
-			fmt.Printf("TEMP %f ", nCell.Temperature)
 			temp255 := int(nCell.Temperature * 255)
+			fmt.Printf("%d\n", temp255)
 			intensity := fmt.Sprintf("%02x", temp255)
-			fmt.Println(nCell.Temperature)
-			fmt.Printf("intensity %s\n", intensity)
 			c := "."
 			color := ""
 			switch cell.Typ {
 			case domain.House:
 				c = "h"
 				color = intensity + "0000"
-				fmt.Printf("house %s\n", color)
 			case domain.Farm:
 				c = "f"
 				color = "00" + intensity + "00"
-				fmt.Printf("farm %s\n", color)
 			case domain.Road:
 				c = "r"
 				color = intensity + intensity + intensity
-				fmt.Printf("road %s\n", color)
+			case domain.PowerPlant:
+				c = "p"
+				color = intensity + intensity + "00"
+			case domain.Dirt:
+				c = "d"
+				color = "0000" + intensity
 			}
 			p := termenv.ColorProfile()
 			if intensity != "" && c != " " && len(color) == 6 {
@@ -53,7 +54,6 @@ func textualize(city domain.City, n *domain.JobTransportNetwork) []string {
 				rowOutput += c
 			}
 		}
-		//fmt.Printf("\n")
 		rows = append(rows, rowOutput)
 	}
 	return rows

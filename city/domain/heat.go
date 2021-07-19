@@ -33,19 +33,17 @@ func (n HeatGrid) Step() {
 		for x := 0; x < len(n.Grid[y]); x++ {
 			influx90, influxors90 := calcWeightedInflux(n.neighbors90(x, y), 1)
 			influx45, influxors45 := calcWeightedInflux(n.neighbors45(x, y), 1.0/4)
-			fmt.Printf("influx90 %v influxors90 %v\n", influx90, influxors90)
-			fmt.Printf("influx45 %v influxors45 %v\n", influx45, influxors45)
 
 			ambientTemp := (influx90 + influx45) / (influxors90 + influxors45)
-			fmt.Printf("ambient %v\n", ambientTemp)
 
 			me := n.Grid[y][x]
 			tempDelta := ambientTemp - me.Temperature
-			fmt.Printf("tempDelta %v\n", tempDelta)
+			if y == 0 && x == 1 {
+				// the problem is that the road is pulling in the coldness of other things around it
+				fmt.Printf("i am %v, ambient is %v, temp to add is %v via conductivity %v\n", me.Temperature, ambientTemp, tempDelta, me.conductivity)
+			}
 			t := n.Grid[y][x].Temperature
-			fmt.Printf("i was %v\n", t)
 			t += tempDelta * me.conductivity
-			fmt.Printf("now i am %v\n", t)
 			t = math.Min(1, t)
 			t = math.Max(0, t)
 			n.Grid[y][x].Temperature = t
