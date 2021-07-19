@@ -32,7 +32,7 @@ func TestConduct45Degrees(t *testing.T) {
 	conductor := &heat.Grid[1][1]
 	heater.Temperature = 0.1
 	conductor.conductivity = 0.9
-	var expectedConductorTemp float64 = (heater.Temperature * conductor.conductivity / 4) / (influxorWeight90*2 + influxorWeight45)
+	var expectedConductorTemp float64 = (heater.Temperature * conductor.conductivity / 4) / influxorWeight45
 
 	heat.Step()
 
@@ -58,4 +58,16 @@ func TestNonConductingHeaterNotHeated(t *testing.T) {
 	heat.Step()
 
 	assert.InDelta(t, 0.1, heater.Temperature, delta, "heater temp changed")
+}
+
+func TestCoolerCellDoesNotHeatMe(t *testing.T) {
+	heat := NewHeatGrid(2, 1)
+	warm := &heat.Grid[0][0]
+	warm.Temperature = 0.2
+	cool := &heat.Grid[0][1]
+	cool.Temperature = 0.1
+
+	heat.Step()
+
+	assert.InDelta(t, 0.2, warm.Temperature, delta, "warmer cell got cooled")
 }

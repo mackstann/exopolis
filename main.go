@@ -38,7 +38,7 @@ func main() {
 
 	renderer.Render(city, jobTransport)
 
-	realStep := 10 * time.Millisecond
+	realStep := 100 * time.Millisecond
 	for {
 		jobTransport.Step()
 		renderer.Render(city, jobTransport)

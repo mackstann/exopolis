@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -31,22 +30,20 @@ func NewHeatGrid(width int, height int) *HeatGrid {
 func (n HeatGrid) Step() {
 	for y := 0; y < len(n.Grid); y++ {
 		for x := 0; x < len(n.Grid[y]); x++ {
-			influx90, influxors90 := calcWeightedInflux(n.neighbors90(x, y), 1)
-			influx45, influxors45 := calcWeightedInflux(n.neighbors45(x, y), 1.0/4)
-
-			ambientTemp := (influx90 + influx45) / (influxors90 + influxors45)
-
 			me := n.Grid[y][x]
-			tempDelta := ambientTemp - me.Temperature
-			if y == 0 && x == 1 {
-				// the problem is that the road is pulling in the coldness of other things around it
-				fmt.Printf("i am %v, ambient is %v, temp to add is %v via conductivity %v\n", me.Temperature, ambientTemp, tempDelta, me.conductivity)
+			influx90, influxors90 := calcWeightedInflux(me.Temperature, n.neighbors90(x, y), 1)
+			influx45, influxors45 := calcWeightedInflux(me.Temperature, n.neighbors45(x, y), 1.0/4)
+
+			if influxors90 > 0 || influxors45 > 0 {
+				ambientTemp := (influx90 + influx45) / (influxors90 + influxors45)
+
+				tempDelta := ambientTemp - me.Temperature
+				t := n.Grid[y][x].Temperature
+				t += tempDelta * me.conductivity
+				t = math.Min(1, t)
+				t = math.Max(0, t)
+				n.Grid[y][x].Temperature = t
 			}
-			t := n.Grid[y][x].Temperature
-			t += tempDelta * me.conductivity
-			t = math.Min(1, t)
-			t = math.Max(0, t)
-			n.Grid[y][x].Temperature = t
 		}
 	}
 }
@@ -58,9 +55,9 @@ func (n HeatGrid) cellAt(x int, y int) cell {
 	return n.Grid[y][x]
 }
 
-func calcWeightedInflux(cells []cell, weight float64) (influx float64, influxors float64) {
+func calcWeightedInflux(myTemp float64, cells []cell, weight float64) (influx float64, influxors float64) {
 	for _, c := range cells {
-		if c.Temperature != -1 {
+		if c.Temperature != -1 && c.Temperature > myTemp {
 			influx += c.Temperature * weight
 			influxors += 1 * weight
 		}
