@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"fmt"
+	"math"
 )
 
 type HeatGrid struct {
@@ -29,54 +29,18 @@ func NewHeatGrid(width int, height int) *HeatGrid {
 func (n HeatGrid) Step() {
 	for y := 0; y < len(n.Grid); y++ {
 		for x := 0; x < len(n.Grid[y]); x++ {
-			cells := [4]cell{
-				n.cellAt(x-1, y),
-				n.cellAt(x+1, y),
-				n.cellAt(x, y-1),
-				n.cellAt(x, y+1),
-			}
-			diagCells := [4]cell{
-				n.cellAt(x-1, y-1),
-				n.cellAt(x-1, y+1),
-				n.cellAt(x+1, y-1),
-				n.cellAt(x+1, y+1),
-			}
+			influx90, influxors90 := calcWeightedInflux(n.neighbors90(x, y), 1)
+			influx45, influxors45 := calcWeightedInflux(n.neighbors45(x, y), 1.0/4)
 
-			fmt.Printf("-------\n")
+			ambientTemp := (influx90 + influx45) / (influxors90 + influxors45)
+
 			me := n.Grid[y][x]
-			var tote float64
-			var influxors float64
-			// influx, influxors := calcWeightedInflux(cells, weight)
-			for _, c := range cells {
-				if c.Temperature != -1 {
-					fmt.Printf("90deg influxor\n")
-					tote += c.Temperature
-					influxors += 1
-				}
-			}
-			for _, c := range diagCells {
-				if c.Temperature != -1 {
-					fmt.Printf("45deg influxor\n")
-					tote += c.Temperature / 4
-					influxors += 1.0 / 4
-				}
-			}
-
-			fmt.Printf("influxors %f\n", influxors)
-			avg := tote / influxors
-			delta := avg - me.Temperature
-			// DELTA IS 0.5 but i thought it should be 0.1??????
-			if delta > 0 {
-				fmt.Printf("metemp %v delta %v cond %v\n", me.Temperature, delta, me.conductivity)
-				n.Grid[y][x].Temperature += delta * me.conductivity
-				if n.Grid[y][x].Temperature > 1 {
-					n.Grid[y][x].Temperature = 1
-				}
-				if n.Grid[y][x].Temperature < 0 {
-					n.Grid[y][x].Temperature = 0
-				}
-			}
-			fmt.Printf("-------\n")
+			tempDelta := ambientTemp - me.Temperature
+			t := n.Grid[y][x].Temperature
+			t += tempDelta * me.conductivity
+			t = math.Min(1, t)
+			t = math.Max(0, t)
+			n.Grid[y][x].Temperature = t
 		}
 	}
 }
@@ -86,4 +50,32 @@ func (n HeatGrid) cellAt(x int, y int) cell {
 		return cell{Temperature: -1, conductivity: -1}
 	}
 	return n.Grid[y][x]
+}
+
+func calcWeightedInflux(cells []cell, weight float64) (influx float64, influxors float64) {
+	for _, c := range cells {
+		if c.Temperature != -1 {
+			influx += c.Temperature * weight
+			influxors += 1 * weight
+		}
+	}
+	return influx, influxors
+}
+
+func (n HeatGrid) neighbors90(x int, y int) []cell {
+	return []cell{
+		n.cellAt(x-1, y),
+		n.cellAt(x+1, y),
+		n.cellAt(x, y-1),
+		n.cellAt(x, y+1),
+	}
+}
+
+func (n HeatGrid) neighbors45(x int, y int) []cell {
+	return []cell{
+		n.cellAt(x-1, y-1),
+		n.cellAt(x-1, y+1),
+		n.cellAt(x+1, y-1),
+		n.cellAt(x+1, y+1),
+	}
 }
