@@ -26,7 +26,6 @@ func textualize(city domain.City, n *domain.JobTransportNetwork) []string {
 		for x, cell := range row {
 			nCell := n.Grid[y][x]
 			temp255 := int(nCell.Temperature * 255)
-			fmt.Printf("%f\n", nCell.Temperature)
 			intensity := fmt.Sprintf("%02x", temp255)
 			c := "."
 			color := ""

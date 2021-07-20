@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	city := domain.NewCity(5)
+	city := domain.NewCity(20)
 
 	// these changes don't affect the city if the network is set up before
 	city[0][0].Typ = domain.House
@@ -38,7 +38,7 @@ func main() {
 
 	renderer.Render(city, jobTransport)
 
-	realStep := 1 * time.Millisecond
+	realStep := 10 * time.Millisecond
 	for {
 		jobTransport.Step()
 		renderer.Render(city, jobTransport)
