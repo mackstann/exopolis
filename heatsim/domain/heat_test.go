@@ -19,8 +19,8 @@ func TestConduct90Degrees(t *testing.T) {
 	heater := &heat.Grid[0][0]
 	conductor := &heat.Grid[0][1]
 	heater.Temperature = 0.1
-	conductor.conductivity = 0.9
-	var expectedConductorTemp float64 = (heater.Temperature * conductor.conductivity * conductionEfficiency) / influxorWeight90
+	conductor.Conductivity = 0.9
+	var expectedConductorTemp float64 = (heater.Temperature * conductor.Conductivity * conductionEfficiency) / influxorWeight90
 
 	heat.Step()
 
@@ -32,8 +32,8 @@ func TestConduct45Degrees(t *testing.T) {
 	heater := &heat.Grid[0][0]
 	conductor := &heat.Grid[1][1]
 	heater.Temperature = 0.1
-	conductor.conductivity = 0.9
-	var expectedConductorTemp float64 = (heater.Temperature * conductor.conductivity * conductionEfficiency / 4) / influxorWeight45
+	conductor.Conductivity = 0.9
+	var expectedConductorTemp float64 = (heater.Temperature * conductor.Conductivity * conductionEfficiency / 4) / influxorWeight45
 
 	heat.Step()
 

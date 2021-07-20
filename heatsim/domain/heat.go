@@ -14,9 +14,9 @@ type HeatGrid struct {
 
 type cell struct {
 	Temperature float64
-	// conductivity controls the rate of heat flow into this cell. Heat flow out is unrestricted. Conductivity
+	// Conductivity controls the rate of heat flow into this cell. Heat flow out is unrestricted. Conductivity
 	// manifests as the speed at which heat flows between cells.
-	conductivity float64
+	Conductivity float64
 }
 
 type row []cell
@@ -44,7 +44,7 @@ func (n HeatGrid) Step() {
 
 				tempDelta := ambientTemp - me.Temperature
 				t := n.Grid[y][x].Temperature
-				t += tempDelta * me.conductivity
+				t += tempDelta * me.Conductivity
 				t = math.Min(1, t)
 				t = math.Max(0, t)
 				n.Grid[y][x].Temperature = t
@@ -55,7 +55,7 @@ func (n HeatGrid) Step() {
 
 func (n HeatGrid) cellAt(x int, y int) cell {
 	if x < 0 || y < 0 || y >= len(n.Grid) || x >= len(n.Grid[0]) {
-		return cell{Temperature: -1, conductivity: -1}
+		return cell{Temperature: -1, Conductivity: -1}
 	}
 	return n.Grid[y][x]
 }
