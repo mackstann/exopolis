@@ -6,7 +6,8 @@ type JobTransportNetwork struct {
 }
 
 func NewJobTransportNetwork(city City) *JobTransportNetwork {
-	heat := NewHeatGrid(len(city[0]), len(city))
+	const efficiency = 0.9
+	heat := NewHeatGrid(len(city[0]), len(city), efficiency)
 	for y := 0; y < len(city); y++ {
 		for x := 0; x < len(city[y]); x++ {
 			c := city[y][x]
