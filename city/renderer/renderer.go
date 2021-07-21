@@ -31,19 +31,19 @@ func textualize(city domain.City, n *domain.JobTransportNetwork) []string {
 			color := ""
 			switch cell.Typ {
 			case domain.House:
-				c = "h"
+				c = "■"
 				color = intensity + "0000"
 			case domain.Farm:
-				c = "f"
+				c = "▤"
 				color = "00" + intensity + "00"
 			case domain.Road:
-				c = "r"
+				c = "▪"
 				color = intensity + intensity + intensity
 			case domain.PowerPlant:
 				c = "p"
 				color = intensity + intensity + "00"
 			case domain.Dirt:
-				c = "d"
+				c = "░"
 				color = "0000" + intensity
 			}
 			p := termenv.ColorProfile()
