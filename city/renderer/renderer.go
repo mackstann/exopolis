@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/mackstann/exoplanet/city/domain"
+	"github.com/mackstann/exopolis/city/domain"
 
 	"github.com/muesli/termenv"
 )

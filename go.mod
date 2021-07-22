@@ -1,4 +1,4 @@
-module github.com/mackstann/exoplanet
+module github.com/mackstann/exopolis
 
 go 1.16
 

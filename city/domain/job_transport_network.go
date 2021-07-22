@@ -1,7 +1,7 @@
 package domain
 
 import (
-	heatsim "github.com/mackstann/exoplanet/heatsim/domain"
+	heatsim "github.com/mackstann/exopolis/heatsim/domain"
 )
 
 type JobTransportNetwork struct {
