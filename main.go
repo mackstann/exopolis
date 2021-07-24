@@ -18,7 +18,7 @@ func main() {
 	defer f.Close()
 	log.SetOutput(f)
 
-	city := cityDomain.NewCity(20)
+	city := cityDomain.NewCity(40)
 
 	// problem: heat grid is now operating on an irrelevant grid
 	network := cityDomain.NewJobTransportNetwork(city)

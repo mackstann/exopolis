@@ -52,10 +52,18 @@ func (g *Game) Run() {
 	g.mapGenerator.Generate(city)
 	input := g.input.Events()
 	log.Println("game Run loop")
-	for ev := range input {
-		if ev == QuitEvent {
-			// TODO tell the terminal output to shutdown
-			return
+
+	// loop at time interval
+	// non-blockingly check input chan
+	// send msg to drawRequests
+	for {
+		select {
+		case ev := <-input:
+			if ev == QuitEvent {
+				// TODO tell the terminal output to shutdown
+				return
+			}
+		default:
 		}
 		for i := 0; i < 1; i++ {
 			g.city.Step()
