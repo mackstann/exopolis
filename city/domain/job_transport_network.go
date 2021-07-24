@@ -5,30 +5,25 @@ import (
 )
 
 type JobTransportNetwork struct {
-	city City
+	city *City
 	*heatsim.HeatGrid
 }
 
-func NewJobTransportNetwork(city City) *JobTransportNetwork {
+func NewJobTransportNetwork(city *City) *JobTransportNetwork {
 	const efficiency = 0.9
-	heat := heatsim.NewHeatGrid(len(city[0]), len(city), efficiency)
-	for y := 0; y < len(city); y++ {
-		for x := 0; x < len(city[y]); x++ {
-			c := city[y][x]
-			heatCell := &heat.Grid[y][x]
-			switch c.Typ {
-			case Dirt:
-				heatCell.Conductivity = 0.1
-			case Road:
-				heatCell.Conductivity = 0.9
-			case Farm:
-				heatCell.Temperature = 0.1
-			case PowerPlant:
-				heatCell.Temperature = 1
-			}
+	temperature := func(x int, y int) *float64 {
+		if y < 0 || y >= len(*city) || x < 0 || x >= len((*city)[0]) {
+			return nil
 		}
+		return &(*city)[y][x].JobTemperature
 	}
-
+	conductivity := func(x int, y int) *float64 {
+		if y < 0 || y >= len(*city) || x < 0 || x >= len((*city)[0]) {
+			return nil
+		}
+		return &(*city)[y][x].JobConductivity
+	}
+	heat := heatsim.NewHeatGrid(len((*city)[0]), len((*city)), efficiency, temperature, conductivity)
 	return &JobTransportNetwork{
 		city:     city,
 		HeatGrid: heat,

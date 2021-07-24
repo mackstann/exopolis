@@ -9,14 +9,16 @@ import (
 	"github.com/muesli/termenv"
 )
 
-func Render(city domain.City, n *domain.JobTransportNetwork) {
-	if termenv.ColorProfile() != termenv.TrueColor {
-		log.Fatalf("not enough color! %v, want %v", termenv.ColorProfile(), termenv.TrueColor)
-	}
-
-	for _, row := range textualize(city, n) {
-		fmt.Println(row)
-	}
+func RenderTerminalTextBlock(city domain.City, n *domain.JobTransportNetwork) []string {
+	// TODO belongs at game scope
+	/*
+		argggggggggggggggg
+		if termenv.ColorProfile() != termenv.TrueColor {
+			log.Fatalf("not enough color! %v, want %v", termenv.ColorProfile(), termenv.TrueColor)
+		}
+	*/
+	log.Println("render it")
+	return textualize(city, n)
 }
 
 func textualize(city domain.City, n *domain.JobTransportNetwork) []string {
@@ -24,8 +26,7 @@ func textualize(city domain.City, n *domain.JobTransportNetwork) []string {
 	for y, row := range city {
 		rowOutput := ""
 		for x, cell := range row {
-			nCell := n.Grid[y][x]
-			temp255 := int(nCell.Temperature * 255)
+			temp255 := int(city[y][x].JobTemperature * 255)
 			intensity := fmt.Sprintf("%02x", temp255)
 			c := "."
 			color := ""

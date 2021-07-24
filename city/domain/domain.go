@@ -34,6 +34,9 @@ const (
 type Cell struct {
 	Typ CellType
 
+	JobConductivity float64
+	JobTemperature  float64
+
 	Farm       *FarmCell
 	House      *HouseCell
 	PowerPlant *PowerPlantCell
@@ -41,19 +44,13 @@ type Cell struct {
 	Road       *RoadCell
 }
 
-type FarmCell struct {
-	level int
-}
+type FarmCell struct{}
 
-type HouseCell struct {
-	level int
-}
+type HouseCell struct{}
 
 type PowerLineCell struct{}
 
-type PowerPlantCell struct {
-	production int
-}
+type PowerPlantCell struct{}
 
 type RoadCell struct{}
 
