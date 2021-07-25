@@ -7,7 +7,7 @@ import (
 )
 
 type CityService interface {
-	Get() *city.City
+	GenerateMap()
 	Render() []string
 	Step()
 }
@@ -33,24 +33,21 @@ const (
 )
 
 type Game struct {
-	city         CityService
-	mapGenerator MapGeneratorService
-	input        InputPort
-	tui          TerminalUIPort
+	city  CityService
+	input InputPort
+	tui   TerminalUIPort
 }
 
-func NewGame(city CityService, mapGenerator MapGeneratorService, input InputPort, tui TerminalUIPort) *Game {
+func NewGame(city CityService, input InputPort, tui TerminalUIPort) *Game {
 	return &Game{
-		city:         city,
-		mapGenerator: mapGenerator,
-		input:        input,
-		tui:          tui,
+		city:  city,
+		input: input,
+		tui:   tui,
 	}
 }
 
 func (g *Game) Run() {
-	city := g.city.Get()
-	g.mapGenerator.Generate(city)
+	g.city.GenerateMap()
 	log.Println("game Run loop")
 
 	for {

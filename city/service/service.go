@@ -10,19 +10,16 @@ type CityService struct {
 	city     *city.City
 	renderer RenderFunc
 	network  *city.JobTransportNetwork
+	mapgen   *city.MapGenerator
 }
 
-func NewCityService(c *city.City, renderer RenderFunc, network *city.JobTransportNetwork) *CityService {
+func NewCityService(c *city.City, renderer RenderFunc, network *city.JobTransportNetwork, mapgen *city.MapGenerator) *CityService {
 	return &CityService{
 		city:     c,
 		renderer: renderer,
 		network:  network,
+		mapgen:   mapgen,
 	}
-}
-
-// TODO this shouldn't be exposed
-func (a *CityService) Get() *city.City {
-	return a.city
 }
 
 func (a *CityService) Render() []string {
@@ -31,4 +28,8 @@ func (a *CityService) Render() []string {
 
 func (a *CityService) Step() {
 	a.network.Step()
+}
+
+func (a *CityService) GenerateMap() {
+	a.mapgen.Generate()
 }
