@@ -17,7 +17,7 @@ type MapGeneratorService interface {
 }
 
 type InputPort interface {
-	Events() chan InputEvent
+	GetInputEventsNonBlocking() []InputEvent
 }
 
 type TerminalUIPort interface {
@@ -50,20 +50,17 @@ func NewGame(city CityService, mapGenerator MapGeneratorService, input InputPort
 func (g *Game) Run() {
 	city := g.city.Get()
 	g.mapGenerator.Generate(city)
-	input := g.input.Events()
 	log.Println("game Run loop")
 
 	// loop at time interval
 	// non-blockingly check input chan
 	// send msg to drawRequests
 	for {
-		select {
-		case ev := <-input:
+		for _, ev := range g.input.GetInputEventsNonBlocking() {
 			if ev == QuitEvent {
 				// TODO tell the terminal output to shutdown
 				return
 			}
-		default:
 		}
 		for i := 0; i < 1; i++ {
 			g.city.Step()

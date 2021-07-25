@@ -10,14 +10,14 @@ import (
 )
 
 type TerminalAdapter struct {
-	events       chan domain.InputEvent
+	inputEvents  chan domain.InputEvent
 	drawRequests chan struct{}
 	city         []string
 }
 
 func NewTerminalAdapter() *TerminalAdapter {
 	adapter := &TerminalAdapter{
-		events:       make(chan domain.InputEvent),
+		inputEvents:  make(chan domain.InputEvent, 10),
 		drawRequests: make(chan struct{}),
 	}
 
@@ -38,8 +38,17 @@ func waitForActivity(ch chan struct{}) tea.Cmd {
 	}
 }
 
-func (a *TerminalAdapter) Events() chan domain.InputEvent {
-	return a.events
+func (a *TerminalAdapter) GetInputEventsNonBlocking() []domain.InputEvent {
+	// we'll usually get 0 events
+	var events []domain.InputEvent
+	for {
+		select {
+		case ev := <-a.inputEvents:
+			events = append(events, ev)
+		default:
+			return events
+		}
+	}
 }
 
 // Satisfies bubbletea's interface
@@ -54,11 +63,11 @@ func (a *TerminalAdapter) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
-			a.events <- domain.QuitEvent
+			a.inputEvents <- domain.QuitEvent
 			return a, nil
 		}
 	}
-	a.events <- domain.TODONoopEvent
+	a.inputEvents <- domain.TODONoopEvent
 	return a, waitForActivity(a.drawRequests)
 }
 
@@ -73,5 +82,10 @@ func (a *TerminalAdapter) View() string {
 func (a *TerminalAdapter) TODORenderJustCity(city []string) {
 	log.Println("tui getting new rendered city")
 	a.city = city
-	a.drawRequests <- struct{}{}
+
+	// try to send a draw request, but avoid being blocked
+	select {
+	case a.drawRequests <- struct{}{}:
+	default:
+	}
 }
