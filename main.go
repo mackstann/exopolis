@@ -6,6 +6,7 @@ import (
 
 	"github.com/mackstann/exopolis/city"
 	renderer "github.com/mackstann/exopolis/city/renderer"
+	cityService "github.com/mackstann/exopolis/city/service"
 	gameAdapters "github.com/mackstann/exopolis/game/adapters"
 	gameDomain "github.com/mackstann/exopolis/game/domain"
 )
@@ -23,10 +24,10 @@ func main() {
 	// problem: heat grid is now operating on an irrelevant grid
 	network := city.NewJobTransportNetwork(c)
 
-	cityAdapter := gameAdapters.NewCityAdapter(c, renderer.RenderTerminalTextBlock, network)
+	cityService := cityService.NewCityService(c, renderer.RenderTerminalTextBlock, network)
 	mapGenerator := &mapgen{}
 	terminal := gameAdapters.NewTerminalAdapter()
-	game := gameDomain.NewGame(cityAdapter, mapGenerator, terminal, terminal)
+	game := gameDomain.NewGame(cityService, mapGenerator, terminal, terminal)
 	game.Run()
 }
 

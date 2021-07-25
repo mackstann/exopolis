@@ -6,29 +6,29 @@ import (
 
 type RenderFunc func(city.City, *city.JobTransportNetwork) []string
 
-type CityAdapter struct {
-	city *city.City
-	// TODO belongs in city app layer!
+type CityService struct {
+	city     *city.City
 	renderer RenderFunc
 	network  *city.JobTransportNetwork
 }
 
-func NewCityAdapter(c *city.City, renderer RenderFunc, network *city.JobTransportNetwork) *CityAdapter {
-	return &CityAdapter{
+func NewCityService(c *city.City, renderer RenderFunc, network *city.JobTransportNetwork) *CityService {
+	return &CityService{
 		city:     c,
 		renderer: renderer,
 		network:  network,
 	}
 }
 
-func (a *CityAdapter) Get() *city.City {
+// TODO this shouldn't be exposed
+func (a *CityService) Get() *city.City {
 	return a.city
 }
 
-func (a *CityAdapter) Render() []string {
+func (a *CityService) Render() []string {
 	return a.renderer(*a.city, a.network)
 }
 
-func (a *CityAdapter) Step() {
+func (a *CityService) Step() {
 	a.network.Step()
 }
