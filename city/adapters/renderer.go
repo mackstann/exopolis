@@ -9,7 +9,7 @@ import (
 	"github.com/muesli/termenv"
 )
 
-func RenderTerminalTextBlock(city city.City, n *city.JobTransportNetwork) []string {
+func Render(city city.City, n *city.JobTransportNetwork) []string {
 	// TODO belongs at game scope
 	/*
 		argggggggggggggggg
