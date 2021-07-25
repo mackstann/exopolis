@@ -12,6 +12,8 @@ import (
 type TerminalAdapter struct {
 	inputEvents  chan domain.InputEvent
 	drawRequests chan struct{}
+	quitRequest  chan struct{}
+	quitComplete chan struct{}
 	city         []string
 }
 
@@ -19,6 +21,8 @@ func NewTerminalAdapter() *TerminalAdapter {
 	adapter := &TerminalAdapter{
 		inputEvents:  make(chan domain.InputEvent, 10),
 		drawRequests: make(chan struct{}),
+		quitRequest:  make(chan struct{}),
+		quitComplete: make(chan struct{}),
 	}
 
 	go func() {
@@ -26,6 +30,7 @@ func NewTerminalAdapter() *TerminalAdapter {
 		if err := p.Start(); err != nil {
 			log.Fatal(err) // TODO don't control exit here
 		}
+		adapter.quitComplete <- struct{}{}
 	}()
 
 	return adapter
@@ -34,6 +39,18 @@ func NewTerminalAdapter() *TerminalAdapter {
 func (a *TerminalAdapter) waitForDrawRequest() tea.Msg {
 	<-a.drawRequests
 	return struct{}{}
+}
+
+type quitRequest struct{}
+
+func (a *TerminalAdapter) waitForQuitRequest() tea.Msg {
+	<-a.quitRequest
+	return quitRequest{}
+}
+
+func (a *TerminalAdapter) Shutdown() {
+	a.quitRequest <- quitRequest{}
+	<-a.quitComplete
 }
 
 func (a *TerminalAdapter) GetInputEventsNonBlocking() []domain.InputEvent {
@@ -51,11 +68,13 @@ func (a *TerminalAdapter) GetInputEventsNonBlocking() []domain.InputEvent {
 
 // Satisfies bubbletea's interface
 func (a *TerminalAdapter) Init() tea.Cmd {
-	return tea.Batch(tea.EnterAltScreen, a.waitForDrawRequest)
+	return tea.Batch(tea.EnterAltScreen, a.waitForDrawRequest, a.waitForQuitRequest)
 }
 
 // Satisfies bubbletea's interface
 func (a *TerminalAdapter) Update(message tea.Msg) (tea.Model, tea.Cmd) {
+	// draw requests hit this function but there's no need to take any action; bubbletea will redraw simply because
+	// Update was called.
 	log.Println("tui Update()")
 	switch msg := message.(type) {
 	case tea.KeyMsg:
@@ -64,14 +83,13 @@ func (a *TerminalAdapter) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 			a.inputEvents <- domain.QuitEvent
 			return a, nil
 		}
+	case quitRequest:
+		return a, tea.Quit
 	}
 	a.inputEvents <- domain.TODONoopEvent
 	return a, a.waitForDrawRequest
 }
 
-// TODO: Wire up the real exit impl to trigger a tea.Quit
-
-// TODO: Wire up output to this
 func (a *TerminalAdapter) View() string {
 	log.Println("tui View()")
 	return strings.Join(a.city, "\n")

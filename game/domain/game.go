@@ -22,6 +22,7 @@ type InputPort interface {
 
 type TerminalUIPort interface {
 	TODORenderJustCity([]string)
+	Shutdown()
 }
 
 type InputEvent int
@@ -52,13 +53,10 @@ func (g *Game) Run() {
 	g.mapGenerator.Generate(city)
 	log.Println("game Run loop")
 
-	// loop at time interval
-	// non-blockingly check input chan
-	// send msg to drawRequests
 	for {
 		for _, ev := range g.input.GetInputEventsNonBlocking() {
 			if ev == QuitEvent {
-				// TODO tell the terminal output to shutdown
+				g.tui.Shutdown()
 				return
 			}
 		}
