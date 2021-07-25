@@ -31,11 +31,9 @@ func NewTerminalAdapter() *TerminalAdapter {
 	return adapter
 }
 
-func waitForActivity(ch chan struct{}) tea.Cmd {
-	return func() tea.Msg {
-		<-ch
-		return struct{}{}
-	}
+func (a *TerminalAdapter) waitForDrawRequest() tea.Msg {
+	<-a.drawRequests
+	return struct{}{}
 }
 
 func (a *TerminalAdapter) GetInputEventsNonBlocking() []domain.InputEvent {
@@ -53,7 +51,7 @@ func (a *TerminalAdapter) GetInputEventsNonBlocking() []domain.InputEvent {
 
 // Satisfies bubbletea's interface
 func (a *TerminalAdapter) Init() tea.Cmd {
-	return tea.Batch(tea.EnterAltScreen, waitForActivity(a.drawRequests))
+	return tea.Batch(tea.EnterAltScreen, a.waitForDrawRequest)
 }
 
 // Satisfies bubbletea's interface
@@ -68,7 +66,7 @@ func (a *TerminalAdapter) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 	a.inputEvents <- domain.TODONoopEvent
-	return a, waitForActivity(a.drawRequests)
+	return a, a.waitForDrawRequest
 }
 
 // TODO: Wire up the real exit impl to trigger a tea.Quit
