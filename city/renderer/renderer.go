@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/mackstann/exopolis/city/domain"
+	"github.com/mackstann/exopolis/city"
 
 	"github.com/muesli/termenv"
 )
 
-func RenderTerminalTextBlock(city domain.City, n *domain.JobTransportNetwork) []string {
+func RenderTerminalTextBlock(city city.City, n *city.JobTransportNetwork) []string {
 	// TODO belongs at game scope
 	/*
 		argggggggggggggggg
@@ -21,29 +21,29 @@ func RenderTerminalTextBlock(city domain.City, n *domain.JobTransportNetwork) []
 	return textualize(city, n)
 }
 
-func textualize(city domain.City, n *domain.JobTransportNetwork) []string {
-	rows := make([]string, 0, len(city))
-	for y, row := range city {
+func textualize(c city.City, n *city.JobTransportNetwork) []string {
+	rows := make([]string, 0, len(c))
+	for y, row := range c {
 		rowOutput := ""
 		for x, cell := range row {
-			temp255 := int(city[y][x].JobTemperature * 255)
+			temp255 := int(c[y][x].JobTemperature * 255)
 			intensity := fmt.Sprintf("%02x", temp255)
 			c := "."
 			color := ""
 			switch cell.Typ {
-			case domain.House:
+			case city.House:
 				c = "■"
 				color = intensity + "0000"
-			case domain.Farm:
+			case city.Farm:
 				c = "▤"
 				color = "00" + intensity + "00"
-			case domain.Road:
+			case city.Road:
 				c = "▪"
 				color = intensity + intensity + intensity
-			case domain.PowerPlant:
+			case city.PowerPlant:
 				c = "p"
 				color = intensity + intensity + "00"
-			case domain.Dirt:
+			case city.Dirt:
 				c = "░"
 				color = "0000" + intensity
 			}

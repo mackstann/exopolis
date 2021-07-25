@@ -3,17 +3,17 @@ package domain
 import (
 	"log"
 
-	cityDomain "github.com/mackstann/exopolis/city/domain"
+	"github.com/mackstann/exopolis/city"
 )
 
 type CityService interface {
-	Get() *cityDomain.City
+	Get() *city.City
 	Render() []string
 	Step()
 }
 
 type MapGeneratorService interface {
-	Generate(*cityDomain.City)
+	Generate(*city.City)
 }
 
 type InputPort interface {

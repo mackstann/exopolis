@@ -1,27 +1,27 @@
 package adapters
 
 import (
-	cityDomain "github.com/mackstann/exopolis/city/domain"
+	"github.com/mackstann/exopolis/city"
 )
 
-type RenderFunc func(city cityDomain.City, n *cityDomain.JobTransportNetwork) []string
+type RenderFunc func(city.City, *city.JobTransportNetwork) []string
 
 type CityAdapter struct {
-	city *cityDomain.City
+	city *city.City
 	// TODO belongs in city app layer!
 	renderer RenderFunc
-	network  *cityDomain.JobTransportNetwork
+	network  *city.JobTransportNetwork
 }
 
-func NewCityAdapter(city *cityDomain.City, renderer RenderFunc, network *cityDomain.JobTransportNetwork) *CityAdapter {
+func NewCityAdapter(c *city.City, renderer RenderFunc, network *city.JobTransportNetwork) *CityAdapter {
 	return &CityAdapter{
-		city:     city,
+		city:     c,
 		renderer: renderer,
 		network:  network,
 	}
 }
 
-func (a *CityAdapter) Get() *cityDomain.City {
+func (a *CityAdapter) Get() *city.City {
 	return a.city
 }
 

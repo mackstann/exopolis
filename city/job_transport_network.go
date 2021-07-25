@@ -1,4 +1,4 @@
-package domain
+package city
 
 import (
 	heatsim "github.com/mackstann/exopolis/heatsim/domain"
