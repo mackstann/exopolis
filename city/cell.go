@@ -31,9 +31,11 @@ const (
 // level is determined by field strengths
 // e.g. formula: house level is (electricalBool x foodTransport x jobTransport x (1-pollution) x (1-noise))
 
-type Cell struct {
-	Typ CellType
+type Resources struct {
+	Jobs float64
+}
 
-	JobConductivity float64
-	JobTemperature  float64
+type Cell struct {
+	Typ       CellType
+	Resources Resources
 }
