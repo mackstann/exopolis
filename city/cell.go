@@ -36,20 +36,4 @@ type Cell struct {
 
 	JobConductivity float64
 	JobTemperature  float64
-
-	Farm       *FarmCell
-	House      *HouseCell
-	PowerPlant *PowerPlantCell
-	PowerLine  *PowerLineCell
-	Road       *RoadCell
 }
-
-type FarmCell struct{}
-
-type HouseCell struct{}
-
-type PowerLineCell struct{}
-
-type PowerPlantCell struct{}
-
-type RoadCell struct{}
