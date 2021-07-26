@@ -6,11 +6,11 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/mackstann/exopolis/game/domain"
+	"github.com/mackstann/exopolis/game"
 )
 
 type TerminalAdapter struct {
-	inputEvents  chan domain.InputEvent
+	inputEvents  chan game.InputEvent
 	drawRequests chan struct{}
 	quitRequest  chan struct{}
 	quitComplete chan struct{}
@@ -19,7 +19,7 @@ type TerminalAdapter struct {
 
 func NewTerminalAdapter() *TerminalAdapter {
 	adapter := &TerminalAdapter{
-		inputEvents:  make(chan domain.InputEvent, 10),
+		inputEvents:  make(chan game.InputEvent, 10),
 		drawRequests: make(chan struct{}),
 		quitRequest:  make(chan struct{}),
 		quitComplete: make(chan struct{}),
@@ -53,9 +53,9 @@ func (a *TerminalAdapter) Shutdown() {
 	<-a.quitComplete
 }
 
-func (a *TerminalAdapter) GetInputEventsNonBlocking() []domain.InputEvent {
+func (a *TerminalAdapter) GetInputEventsNonBlocking() []game.InputEvent {
 	// we'll usually get 0 events
-	var events []domain.InputEvent
+	var events []game.InputEvent
 	for {
 		select {
 		case ev := <-a.inputEvents:
@@ -80,13 +80,13 @@ func (a *TerminalAdapter) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "esc", "ctrl+c":
-			a.inputEvents <- domain.QuitEvent
+			a.inputEvents <- game.QuitEvent
 			return a, nil
 		}
 	case quitRequest:
 		return a, tea.Quit
 	}
-	a.inputEvents <- domain.TODONoopEvent
+	a.inputEvents <- game.TODONoopEvent
 	return a, a.waitForDrawRequest
 }
 

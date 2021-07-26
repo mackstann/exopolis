@@ -1,19 +1,13 @@
-package domain
+package game
 
 import (
 	"log"
-
-	"github.com/mackstann/exopolis/city"
 )
 
 type CityService interface {
 	GenerateMap()
 	Render() []string
 	Step()
-}
-
-type MapGeneratorService interface {
-	Generate(*city.City)
 }
 
 type InputPort interface {

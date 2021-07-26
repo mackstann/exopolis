@@ -7,8 +7,8 @@ import (
 	"github.com/mackstann/exopolis/city"
 	cityAdapters "github.com/mackstann/exopolis/city/adapters"
 	cityService "github.com/mackstann/exopolis/city/service"
+	"github.com/mackstann/exopolis/game"
 	gameAdapters "github.com/mackstann/exopolis/game/adapters"
-	gameDomain "github.com/mackstann/exopolis/game/domain"
 )
 
 func main() {
@@ -26,6 +26,6 @@ func main() {
 
 	cityService := cityService.NewCityService(c, cityAdapters.Render, network, city.NewMapGenerator(c))
 	terminal := gameAdapters.NewTerminalAdapter()
-	game := gameDomain.NewGame(cityService, terminal, terminal)
+	game := game.NewGame(cityService, terminal, terminal)
 	game.Run()
 }
