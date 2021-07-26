@@ -1,7 +1,7 @@
 package city
 
 import (
-	heatsim "github.com/mackstann/exopolis/heatsim/domain"
+	"github.com/mackstann/exopolis/heatsim"
 )
 
 type JobTransportNetwork struct {
