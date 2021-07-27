@@ -1,4 +1,4 @@
-package renderer
+package adapters
 
 import (
 	"fmt"
@@ -9,19 +9,27 @@ import (
 	"github.com/muesli/termenv"
 )
 
-func Render(city city.City, n *city.JobTransportNetwork) []string {
-	// TODO belongs at game scope
+type CityRenderer struct {
+	city *city.City
+}
+
+func NewCityRenderer(c *city.City) *CityRenderer {
+	return &CityRenderer{
+		city: c,
+	}
+}
+
+func (r *CityRenderer) Render() []string {
 	/*
-		argggggggggggggggg
 		if termenv.ColorProfile() != termenv.TrueColor {
 			log.Fatalf("not enough color! %v, want %v", termenv.ColorProfile(), termenv.TrueColor)
 		}
 	*/
 	log.Println("render it")
-	return textualize(city, n)
+	return textualize(*r.city)
 }
 
-func textualize(c city.City, n *city.JobTransportNetwork) []string {
+func textualize(c city.City) []string {
 	rows := make([]string, 0, len(c))
 	for y, row := range c {
 		rowOutput := ""

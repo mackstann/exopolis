@@ -6,8 +6,11 @@ import (
 
 type CityService interface {
 	GenerateMap()
-	Render() []string
 	Step()
+}
+
+type CityRendererPort interface {
+	Render() []string
 }
 
 type InputPort interface {
@@ -27,16 +30,18 @@ const (
 )
 
 type Game struct {
-	city  CityService
-	input InputPort
-	tui   TerminalUIPort
+	city         CityService
+	input        InputPort
+	tui          TerminalUIPort
+	cityRenderer CityRendererPort
 }
 
-func NewGame(city CityService, input InputPort, tui TerminalUIPort) *Game {
+func NewGame(city CityService, input InputPort, tui TerminalUIPort, cityRenderer CityRendererPort) *Game {
 	return &Game{
-		city:  city,
-		input: input,
-		tui:   tui,
+		city:         city,
+		input:        input,
+		tui:          tui,
+		cityRenderer: cityRenderer,
 	}
 }
 
@@ -54,7 +59,18 @@ func (g *Game) Run() {
 		for i := 0; i < 1; i++ {
 			g.city.Step()
 		}
-		text := g.city.Render()
+		/* this is weird...
+		should the city service know what datatype render returns?
+		should the game service know it either?
+		interactor -> presenter -> view
+		then the interactor and view are ignorant of each others' formats
+		but let's skip the view?
+
+		we can know about city stuff, but only through its service API
+		and make sure cross-feature deps are a DAG
+		game -> city -> heatsim
+		*/
+		text := g.cityRenderer.Render()
 		g.tui.TODORenderJustCity(text)
 	}
 }
