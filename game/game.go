@@ -18,15 +18,15 @@ type InputPort interface {
 }
 
 type TerminalUIPort interface {
-	TODORenderJustCity([]string)
+	UpdateCity([]string)
+	Redraw()
 	Shutdown()
 }
 
 type InputEvent int
 
 const (
-	QuitEvent     InputEvent = iota
-	TODONoopEvent            = iota
+	QuitEvent InputEvent = iota
 )
 
 type Game struct {
@@ -71,6 +71,7 @@ func (g *Game) Run() {
 		game -> city -> heatsim
 		*/
 		text := g.cityRenderer.Render()
-		g.tui.TODORenderJustCity(text)
+		g.tui.UpdateCity(text)
+		g.tui.Redraw()
 	}
 }

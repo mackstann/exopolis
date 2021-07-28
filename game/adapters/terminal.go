@@ -86,7 +86,6 @@ func (a *TerminalAdapter) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 	case quitRequest:
 		return a, tea.Quit
 	}
-	a.inputEvents <- game.TODONoopEvent
 	return a, a.waitForDrawRequest
 }
 
@@ -95,11 +94,13 @@ func (a *TerminalAdapter) View() string {
 	return strings.Join(a.city, "\n")
 }
 
-func (a *TerminalAdapter) TODORenderJustCity(city []string) {
+func (a *TerminalAdapter) UpdateCity(city []string) {
 	log.Println("tui getting new rendered city")
 	a.city = city
+}
 
-	// try to send a draw request, but avoid being blocked
+func (a *TerminalAdapter) Redraw() {
+	// try to send a draw request, but avoid being blocked (if one is already pending)
 	select {
 	case a.drawRequests <- struct{}{}:
 	default:

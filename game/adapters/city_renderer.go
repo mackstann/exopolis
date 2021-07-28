@@ -20,11 +20,6 @@ func NewCityRenderer(c *city.City) *CityRenderer {
 }
 
 func (r *CityRenderer) Render() []string {
-	/*
-		if termenv.ColorProfile() != termenv.TrueColor {
-			log.Fatalf("not enough color! %v, want %v", termenv.ColorProfile(), termenv.TrueColor)
-		}
-	*/
 	log.Println("render it")
 	return textualize(*r.city)
 }
