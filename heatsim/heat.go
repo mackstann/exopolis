@@ -20,7 +20,7 @@ type HeatGrid struct {
 type TemperaturePort func(x int, y int) *float64
 type ConductivityPort func(x int, y int) *float64
 
-func NewHeatGrid(width int, height int, efficiency float64, temp TemperaturePort, cond ConductivityPort) *HeatGrid {
+func NewHeatGrid(efficiency float64, temp TemperaturePort, cond ConductivityPort) *HeatGrid {
 	return &HeatGrid{
 		efficiency:   efficiency,
 		temperature:  temp,
@@ -48,10 +48,14 @@ func (n HeatGrid) Step() {
 			if influxors90 > 0 || influxors45 > 0 {
 				ambientTemp := (influx90 + influx45) / (influxors90 + influxors45)
 
+				//log.Printf("x %v, y %v, n neighbors is %d", x, y, int(influxors90+influxors45*4))
+				//log.Printf("x %v, y %v, my conductivity is %v", x, y, (*n.conductivity(x, y)))
+				//log.Printf("x %v, y %v, my temperature  is %v", x, y, (*n.temperature(x, y)))
 				tempDelta := ambientTemp - myTemp
 				myTemp += tempDelta * (*n.conductivity(x, y))
 				myTemp = math.Min(1, myTemp)
 				myTemp = math.Max(0, myTemp)
+				//log.Printf("x %v, y %v, set temp to %v", x, y, myTemp)
 				*myTempPtr = myTemp
 			}
 		}

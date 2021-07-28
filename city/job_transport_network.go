@@ -42,7 +42,7 @@ func NewJobTransportNetwork(city *City) *JobTransportNetwork {
 	// TODO: pointer makes reads vs. writes mysterious
 	// Use getter/setter. Conductivity only needs getter.
 	// return secondary bool value in place of nil
-	heat := heatsim.NewHeatGrid(len((*city)[0]), len((*city)), efficiency, temperature, conductivity)
+	heat := heatsim.NewHeatGrid(efficiency, temperature, conductivity)
 	return &JobTransportNetwork{
 		city:     city,
 		HeatGrid: heat,

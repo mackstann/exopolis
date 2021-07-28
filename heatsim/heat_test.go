@@ -14,61 +14,93 @@ const (
 	conductionEfficiency = 0.9
 )
 
+type cell struct {
+	x            int
+	y            int
+	temperature  float64
+	conductivity float64
+}
+
+func makeTemperaturePort(width int, height int, cells []*cell) TemperaturePort {
+	return func(x int, y int) *float64 {
+		if x < 0 || x >= width || y < 0 || y >= height {
+			return nil
+		}
+		for _, c := range cells {
+			if c.x == x && c.y == y {
+				return &(*c).temperature
+			}
+		}
+		return new(float64)
+	}
+}
+
+func makeConductivityPort(width int, height int, cells []*cell) ConductivityPort {
+	return func(x int, y int) *float64 {
+		if x < 0 || x >= width || y < 0 || y >= height {
+			return nil
+		}
+		for _, c := range cells {
+			if c.x == x && c.y == y {
+				return &(*c).conductivity
+			}
+		}
+		return new(float64)
+	}
+}
+
 func TestConduct90Degrees(t *testing.T) {
-	heat := NewHeatGrid(2, 1, conductionEfficiency)
-	heater := &heat.Grid[0][0]
-	conductor := &heat.Grid[0][1]
-	heater.Temperature = 0.1
-	conductor.Conductivity = 0.9
-	var expectedConductorTemp float64 = (heater.Temperature * conductor.Conductivity * conductionEfficiency) / influxorWeight90
+	heater := cell{x: 0, y: 0, temperature: 0.1}
+	conductor := cell{x: 1, y: 0, conductivity: 0.9}
+	cells := []*cell{&heater, &conductor}
+	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
 
 	heat.Step()
 
-	assert.InDelta(t, expectedConductorTemp, conductor.Temperature, delta, "conductor temperature is wrong")
+	var expectedConductorTemp float64 = (heater.temperature * conductor.conductivity * conductionEfficiency) / influxorWeight90
+	assert.InDelta(t, expectedConductorTemp, conductor.temperature, delta, "conductor temperature is wrong")
 }
 
 func TestConduct45Degrees(t *testing.T) {
-	heat := NewHeatGrid(2, 2, conductionEfficiency)
-	heater := &heat.Grid[0][0]
-	conductor := &heat.Grid[1][1]
-	heater.Temperature = 0.1
-	conductor.Conductivity = 0.9
-	var expectedConductorTemp float64 = (heater.Temperature * conductor.Conductivity * conductionEfficiency / 4) / influxorWeight45
+	heater := cell{x: 0, y: 0, temperature: 0.1}
+	conductor := cell{x: 1, y: 1, conductivity: 0.9}
+	cells := []*cell{&heater, &conductor}
+	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 2, cells), makeConductivityPort(2, 2, cells))
 
 	heat.Step()
 
-	assert.InDelta(t, expectedConductorTemp, conductor.Temperature, delta, "conductor temperature is wrong")
+	var expectedConductorTemp float64 = (heater.temperature * conductor.conductivity * conductionEfficiency / 4) / influxorWeight45
+	assert.InDelta(t, expectedConductorTemp, conductor.temperature, delta, "conductor temperature is wrong")
 }
 
 func TestInsulatorNotHeated(t *testing.T) {
-	heat := NewHeatGrid(2, 1, conductionEfficiency)
-	heater := &heat.Grid[0][0]
-	insulator := &heat.Grid[0][1]
-	heater.Temperature = 0.1
+	heater := cell{x: 0, y: 0, temperature: 0.1}
+	insulator := cell{x: 1, y: 0}
+	cells := []*cell{&heater, &insulator}
+	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
 
 	heat.Step()
 
-	assert.InDelta(t, 0, insulator.Temperature, delta, "insulator temperature is wrong")
+	assert.InDelta(t, 0, insulator.temperature, delta, "insulator temperature is wrong")
 }
 
 func TestNonConductingHeaterNotHeated(t *testing.T) {
-	heat := NewHeatGrid(2, 1, conductionEfficiency)
-	heater := &heat.Grid[0][0]
-	heater.Temperature = 0.1
+	heater := cell{x: 0, y: 0, temperature: 0.1}
+	cells := []*cell{&heater}
+	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
 
 	heat.Step()
 
-	assert.InDelta(t, 0.1, heater.Temperature, delta, "heater temp changed")
+	assert.InDelta(t, 0.1, heater.temperature, delta, "heater temp changed")
 }
 
 func TestCoolerCellDoesNotHeatMe(t *testing.T) {
-	heat := NewHeatGrid(2, 1, conductionEfficiency)
-	warm := &heat.Grid[0][0]
-	warm.Temperature = 0.2
-	cool := &heat.Grid[0][1]
-	cool.Temperature = 0.1
+	warm := cell{x: 0, y: 0, temperature: 0.2}
+	cool := cell{x: 1, y: 0, temperature: 0.1}
+	cells := []*cell{&warm, &cool}
+	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
 
 	heat.Step()
 
-	assert.InDelta(t, 0.2, warm.Temperature, delta, "warmer cell got cooled")
+	assert.InDelta(t, 0.2, warm.temperature, delta, "warmer cell got cooled")
 }
