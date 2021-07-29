@@ -1,6 +1,8 @@
 package city
 
 import (
+	_ "log"
+
 	"github.com/mackstann/exopolis/heatsim"
 )
 
@@ -16,7 +18,6 @@ const (
 )
 
 func NewJobTransportNetwork(city *City) *JobTransportNetwork {
-	const efficiency = 0.9
 	temperature := func(x int, y int) *float64 {
 		if y < 0 || y >= len(*city) || x < 0 || x >= len((*city)[0]) {
 			return nil
@@ -42,6 +43,7 @@ func NewJobTransportNetwork(city *City) *JobTransportNetwork {
 	// TODO: pointer makes reads vs. writes mysterious
 	// Use getter/setter. Conductivity only needs getter.
 	// return secondary bool value in place of nil
+	const efficiency = 0.9
 	heat := heatsim.NewHeatGrid(efficiency, temperature, conductivity)
 	return &JobTransportNetwork{
 		city:     city,

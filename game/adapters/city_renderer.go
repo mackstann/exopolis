@@ -29,7 +29,7 @@ func textualize(c city.City) []string {
 	for y, row := range c {
 		rowOutput := ""
 		for x, cell := range row {
-			temp255 := int(c[y][x].Resources.Jobs * 255)
+			temp255 := int(c[y][x].Resources.Jobs * 255.0)
 			intensity := fmt.Sprintf("%02x", temp255)
 			c := "."
 			color := ""
