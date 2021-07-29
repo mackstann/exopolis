@@ -79,7 +79,7 @@ func (a *TerminalAdapter) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := message.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "q", "esc", "ctrl+c":
+		case "ctrl+c":
 			a.inputEvents <- game.QuitEvent
 			return a, nil
 		}
