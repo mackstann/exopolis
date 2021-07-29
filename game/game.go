@@ -2,6 +2,7 @@ package game
 
 import (
 	"log"
+	"time"
 )
 
 type CityService interface {
@@ -73,5 +74,6 @@ func (g *Game) Run() {
 		text := g.cityRenderer.Render()
 		g.tui.UpdateCity(text)
 		g.tui.Redraw()
+		time.Sleep(time.Second / 60.0)
 	}
 }
