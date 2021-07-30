@@ -32,6 +32,7 @@ func main() {
 	log.Println("game Run loop")
 
 	for {
+		t := time.Now()
 		for _, ev := range terminal.GetInputEventsNonBlocking() {
 			if ev == game.QuitEvent {
 				terminal.Shutdown()
@@ -39,12 +40,18 @@ func main() {
 			}
 		}
 		for i := 0; i < 1; i++ {
+			// TODO: give the game engine its own clock, independent of rendering
 			cityService.Step()
 		}
 		text := renderer.Render()
 		terminal.UpdateCity(text)
 		terminal.Redraw()
-		// TODO: measure / compensate for frame processing time
-		time.Sleep(time.Second / 60.0)
+		tEnd := time.Now()
+
+		duration := tEnd.Sub(t)
+		desiredDuration := time.Duration(time.Second / 30.0)
+		if desiredDuration > duration {
+			time.Sleep(desiredDuration - duration)
+		}
 	}
 }
