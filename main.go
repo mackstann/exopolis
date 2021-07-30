@@ -3,8 +3,9 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
-	"github.com/mackstann/exopolis/city"
+	cityDomain "github.com/mackstann/exopolis/city"
 	cityService "github.com/mackstann/exopolis/city/service"
 	"github.com/mackstann/exopolis/game"
 	gameAdapters "github.com/mackstann/exopolis/game/adapters"
@@ -18,14 +19,32 @@ func main() {
 	defer f.Close()
 	log.SetOutput(f)
 
-	c := city.NewCity(40)
+	city := cityDomain.NewCity(20)
 
 	// problem: heat grid is now operating on an irrelevant grid
-	network := city.NewJobTransportNetwork(c)
+	network := cityDomain.NewJobTransportNetwork(city)
 
-	cityService := cityService.NewCityService(c, network, city.NewMapGenerator(c))
+	cityService := cityService.NewCityService(city, network, cityDomain.NewMapGenerator(city))
 	terminal := gameAdapters.NewTerminalAdapter()
-	renderer := gameAdapters.NewCityRenderer(c)
-	game := game.NewGame(cityService, terminal, terminal, renderer)
-	game.Run()
+	renderer := gameAdapters.NewCityRenderer(city)
+
+	cityService.GenerateMap()
+	log.Println("game Run loop")
+
+	for {
+		for _, ev := range terminal.GetInputEventsNonBlocking() {
+			if ev == game.QuitEvent {
+				terminal.Shutdown()
+				return
+			}
+		}
+		for i := 0; i < 1; i++ {
+			cityService.Step()
+		}
+		text := renderer.Render()
+		terminal.UpdateCity(text)
+		terminal.Redraw()
+		// TODO: measure / compensate for frame processing time
+		time.Sleep(time.Second / 60.0)
+	}
 }
