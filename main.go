@@ -44,6 +44,7 @@ func main() {
 			cityService.Step()
 		}
 		text := renderer.Render()
+		// TODO: for other UI elements, composite multiple layers of text.
 		terminal.UpdateCity(text)
 		terminal.Redraw()
 		tEnd := time.Now()
