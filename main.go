@@ -31,6 +31,9 @@ func main() {
 	cityService.GenerateMap()
 	log.Println("game Run loop")
 
+	frameInterval := time.Duration(time.Second / 30.0)
+	engineTickInterval := time.Duration(time.Second / 30.0)
+	lastTick := time.Now()
 	for {
 		t := time.Now()
 		for _, ev := range terminal.GetInputEventsNonBlocking() {
@@ -38,6 +41,14 @@ func main() {
 				terminal.Shutdown()
 				return
 			}
+		}
+		tickDelta := t.Sub(lastTick)
+		if tickDelta >= engineTickInterval {
+			for tickDelta >= engineTickInterval {
+				cityService.Step()
+				tickDelta -= engineTickInterval
+			}
+			lastTick = time.Now()
 		}
 		for i := 0; i < 1; i++ {
 			// TODO: give the game engine its own clock, independent of rendering
@@ -50,9 +61,8 @@ func main() {
 		tEnd := time.Now()
 
 		duration := tEnd.Sub(t)
-		desiredDuration := time.Duration(time.Second / 30.0)
-		if desiredDuration > duration {
-			time.Sleep(desiredDuration - duration)
+		if frameInterval > duration {
+			time.Sleep(frameInterval - duration)
 		}
 	}
 }
