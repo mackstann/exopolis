@@ -22,6 +22,7 @@ func NewJobTransportNetwork(city *City) *JobTransportNetwork {
 		if y < 0 || y >= len(*city) || x < 0 || x >= len((*city)[0]) {
 			return nil
 		}
+		// TODO: Try making temperature unmodifiable for some cells; see if it negates need for non-cooling hack
 		return &(*city)[y][x].Resources.Jobs
 	}
 	conductivity := func(x int, y int) *float64 {

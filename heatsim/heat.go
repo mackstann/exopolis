@@ -5,21 +5,33 @@ import (
 	"math"
 )
 
-// HeatGrid is .. heat flows into each cell ...
-type HeatGrid struct {
-	// efficiency is the proportion of heat that stays in the system as it flows from one cell to the next. The
-	// remainder is lost as waste. Efficiency manifests as the distance heat can travel before it is lost to decay.
-	efficiency float64
-
-	temperature TemperaturePort
-	// Conductivity controls the rate of heat flow into this cell. Heat flow out is unrestricted. Conductivity
-	// manifests as the speed at which heat flows between cells.
-	conductivity ConductivityPort
-}
-
-type TemperaturePort func(x int, y int) *float64
-type ConductivityPort func(x int, y int) *float64
-
+// NewHeatGrid constructs a heat grid simulation.
+//
+// This is a simulation of heat flow in a 2-dimensional grid. The grid itself is not modeled here; it is only accessed
+// by coordinates through TemperaturePort and ConductivityPort. The heat flow algorithm will automatically probe the
+// boundaries of the grid without knowing its size; all it needs is for those two functions to return a float64 value (0
+// to 1 inclusive) for a given (x, y), or return nil if the coordinates are out of bounds.
+//
+// efficiency (0 to 1 inclusive) is the proportion of heat that stays in the system as it flows from one cell to the
+// next.  The remainder is lost as waste. Efficiency manifests as the distance heat can travel before it is lost to
+// decay.
+//
+// The values returned by conductivityPort control the rate of heat flow into a given cell. Heat flow out is
+// unrestricted. Conductivity manifests as the speed at which heat flows between cells.
+//
+// By tuning the efficiency of the grid and the temperature and conductivity of cells, different city-like phenomena can
+// be simulated: traffic transmitting over a road system, electricity transmitting over power lines, crime and pollution
+// radidating from their sources, etc.
+//
+// Surprising quirks:
+// * Conductivity only affects heat flowing into a cell, not out.
+// * While warm cells heat up cool cells, cool cells do not cool down warm cells. This enables heat to conduct over long
+//   distances, almost more like electricity.
+//
+// Source of the dumbed down math used here:
+// https://demonstrations.wolfram.com/ACellularAutomatonBasedHeatEquation/
+//
+// Inspired by SimCity (SNES).
 func NewHeatGrid(efficiency float64, temp TemperaturePort, cond ConductivityPort) *HeatGrid {
 	return &HeatGrid{
 		efficiency:   efficiency,
@@ -28,15 +40,23 @@ func NewHeatGrid(efficiency float64, temp TemperaturePort, cond ConductivityPort
 	}
 }
 
+type HeatGrid struct {
+	efficiency   float64
+	temperature  TemperaturePort
+	conductivity ConductivityPort
+}
+
+type TemperaturePort func(x int, y int) *float64
+type ConductivityPort func(x int, y int) *float64
+
 func (n HeatGrid) Step() {
 	for y := 0; ; y++ {
-		if n.temperature(0, y) == nil {
-			break // end of rows
-		}
 		for x := 0; ; x++ {
-			//log.Printf("heat grid step: grid[%d][%d] is %v", y, x, n.Grid[y][x])
 			myTempPtr := n.temperature(x, y)
 			if myTempPtr == nil {
+				if x == 0 {
+					return // end of rows
+				}
 				break // end of line
 			}
 			myTemp := *myTempPtr
@@ -47,15 +67,10 @@ func (n HeatGrid) Step() {
 
 			if influxors90 > 0 || influxors45 > 0 {
 				ambientTemp := (influx90 + influx45) / (influxors90 + influxors45)
-
-				//log.Printf("x %v, y %v, n neighbors is %d", x, y, int(influxors90+influxors45*4))
-				//log.Printf("x %v, y %v, my conductivity is %v", x, y, (*n.conductivity(x, y)))
-				//log.Printf("x %v, y %v, my temperature  is %v", x, y, (*n.temperature(x, y)))
 				tempDelta := ambientTemp - myTemp
 				myTemp += tempDelta * (*n.conductivity(x, y))
 				myTemp = math.Min(1, myTemp)
 				myTemp = math.Max(0, myTemp)
-				//log.Printf("x %v, y %v, set temp to %v", x, y, myTemp)
 				*myTempPtr = myTemp
 			}
 		}

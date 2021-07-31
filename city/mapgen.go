@@ -40,15 +40,6 @@ func (g *MapGenerator) Generate() {
 			case 'P':
 				(*g.city)[y][x].Typ = PowerPlant
 				(*g.city)[y][x].Resources.Jobs = 1
-				/* conundrum:
-				if we have 12 farms = 1.2 jobs,
-				and we have 1 power plant = 1 job,
-				then why does the power plant transmit so much more job power?
-				even when the farms are all along the roads
-
-				maybe because temperature does not scale linearly?
-				how do we map between it and linear counting of things?
-				*/
 			}
 		}
 	}
