@@ -25,27 +25,25 @@ func NewJobTransportNetwork(city *City) *JobTransportNetwork {
 		// TODO: Try making temperature unmodifiable for some cells; see if it negates need for non-cooling hack
 		return &(*city)[y][x].Resources.Jobs
 	}
-	conductivity := func(x int, y int) *float64 {
+	getConductivity := func(x int, y int) (float64, bool) {
 		if y < 0 || y >= len(*city) || x < 0 || x >= len((*city)[0]) {
-			return nil
+			return 0, false
 		}
 
-		var c float64
 		switch (*city)[y][x].Typ {
 		case Dirt:
-			c = dirtConductivity
+			return dirtConductivity, true
 		case Road:
-			c = roadConductivity
+			return roadConductivity, true
 		default:
-			c = defaultConductivity
+			return defaultConductivity, true
 		}
-		return &c
 	}
 	// TODO: pointer makes reads vs. writes mysterious
 	// Use getter/setter. Conductivity only needs getter.
 	// return secondary bool value in place of nil
 	const efficiency = 0.9
-	heat := heatsim.NewHeatGrid(efficiency, temperature, conductivity)
+	heat := heatsim.NewHeatGrid(efficiency, temperature, getConductivity)
 	return &JobTransportNetwork{
 		city:     city,
 		HeatGrid: heat,

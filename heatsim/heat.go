@@ -1,7 +1,7 @@
 package heatsim
 
 import (
-	_ "log"
+	"log"
 	"math"
 )
 
@@ -47,7 +47,7 @@ type HeatGrid struct {
 }
 
 type TemperaturePort func(x int, y int) *float64
-type ConductivityPort func(x int, y int) *float64
+type ConductivityPort func(x int, y int) (float64, bool)
 
 func (n HeatGrid) Step() {
 	for y := 0; ; y++ {
@@ -68,7 +68,11 @@ func (n HeatGrid) Step() {
 			if influxors90 > 0 || influxors45 > 0 {
 				ambientTemp := (influx90 + influx45) / (influxors90 + influxors45)
 				tempDelta := ambientTemp - myTemp
-				myTemp += tempDelta * (*n.conductivity(x, y))
+				conductivity, hasConductivity := n.conductivity(x, y)
+				if !hasConductivity {
+					log.Panicf("already checked cell (%d,%d); should always have conductivity", x, y)
+				}
+				myTemp += tempDelta * conductivity
 				myTemp = math.Min(1, myTemp)
 				myTemp = math.Max(0, myTemp)
 				*myTempPtr = myTemp

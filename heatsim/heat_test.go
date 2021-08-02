@@ -36,16 +36,16 @@ func makeTemperaturePort(width int, height int, cells []*cell) TemperaturePort {
 }
 
 func makeConductivityPort(width int, height int, cells []*cell) ConductivityPort {
-	return func(x int, y int) *float64 {
+	return func(x int, y int) (float64, bool) {
 		if x < 0 || x >= width || y < 0 || y >= height {
-			return nil
+			return 0, false
 		}
 		for _, c := range cells {
 			if c.x == x && c.y == y {
-				return &(*c).conductivity
+				return (*c).conductivity, true
 			}
 		}
-		return new(float64)
+		return 0, true
 	}
 }
 
