@@ -32,34 +32,36 @@ import (
 // https://demonstrations.wolfram.com/ACellularAutomatonBasedHeatEquation/
 //
 // Inspired by SimCity (SNES).
-func NewHeatGrid(efficiency float64, temp TemperaturePort, cond ConductivityPort) *HeatGrid {
+func NewHeatGrid(efficiency float64, temp TemperaturePort, setTemp SetTemperaturePort, cond ConductivityPort) *HeatGrid {
 	return &HeatGrid{
-		efficiency:   efficiency,
-		temperature:  temp,
-		conductivity: cond,
+		efficiency:     efficiency,
+		temperature:    temp,
+		setTemperature: setTemp,
+		conductivity:   cond,
 	}
 }
 
 type HeatGrid struct {
-	efficiency   float64
-	temperature  TemperaturePort
-	conductivity ConductivityPort
+	efficiency     float64
+	temperature    TemperaturePort
+	setTemperature SetTemperaturePort
+	conductivity   ConductivityPort
 }
 
-type TemperaturePort func(x int, y int) *float64
+type TemperaturePort func(x int, y int) (float64, bool)
+type SetTemperaturePort func(x int, y int, val float64)
 type ConductivityPort func(x int, y int) (float64, bool)
 
 func (n HeatGrid) Step() {
 	for y := 0; ; y++ {
 		for x := 0; ; x++ {
-			myTempPtr := n.temperature(x, y)
-			if myTempPtr == nil {
+			myTemp, hasTemp := n.temperature(x, y)
+			if !hasTemp {
 				if x == 0 {
 					return // end of rows
 				}
 				break // end of line
 			}
-			myTemp := *myTempPtr
 			x90, y90 := n.neighbors90(x, y)
 			x45, y45 := n.neighbors45(x, y)
 			influx90, influxors90 := n.calcWeightedInflux(myTemp, x90, y90, 1)
@@ -75,7 +77,7 @@ func (n HeatGrid) Step() {
 				myTemp += tempDelta * conductivity
 				myTemp = math.Min(1, myTemp)
 				myTemp = math.Max(0, myTemp)
-				*myTempPtr = myTemp
+				n.setTemperature(x, y, myTemp)
 			}
 		}
 	}
@@ -85,9 +87,9 @@ func (n HeatGrid) calcWeightedInflux(myTemp float64, x []int, y []int, weight fl
 	for i := range x {
 		cx := x[i]
 		cy := y[i]
-		tempPtr := n.temperature(cx, cy)
-		if tempPtr != nil && *tempPtr > myTemp {
-			influx += (*tempPtr * n.efficiency) * weight
+		temp, hasTemp := n.temperature(cx, cy)
+		if hasTemp && temp > myTemp {
+			influx += (temp * n.efficiency) * weight
 			influxors += 1 * weight
 		}
 	}

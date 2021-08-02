@@ -1,6 +1,7 @@
 package heatsim
 
 import (
+	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,16 +23,29 @@ type cell struct {
 }
 
 func makeTemperaturePort(width int, height int, cells []*cell) TemperaturePort {
-	return func(x int, y int) *float64 {
+	return func(x int, y int) (float64, bool) {
 		if x < 0 || x >= width || y < 0 || y >= height {
-			return nil
+			return 0, false
 		}
 		for _, c := range cells {
 			if c.x == x && c.y == y {
-				return &(*c).temperature
+				return (*c).temperature, true
 			}
 		}
-		return new(float64)
+		return 0, true
+	}
+}
+
+func makeSetTemperaturePort(width int, height int, cells []*cell) SetTemperaturePort {
+	return func(x int, y int, val float64) {
+		if x < 0 || x >= width || y < 0 || y >= height {
+			log.Panicf("set temp out of bounds: (%d,%d)", x, y)
+		}
+		for _, c := range cells {
+			if c.x == x && c.y == y {
+				(*c).temperature = val
+			}
+		}
 	}
 }
 
@@ -53,7 +67,7 @@ func TestConduct90Degrees(t *testing.T) {
 	heater := cell{x: 0, y: 0, temperature: 0.1}
 	conductor := cell{x: 1, y: 0, conductivity: 0.9}
 	cells := []*cell{&heater, &conductor}
-	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
+	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeSetTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
 
 	heat.Step()
 
@@ -65,7 +79,7 @@ func TestConduct45Degrees(t *testing.T) {
 	heater := cell{x: 0, y: 0, temperature: 0.1}
 	conductor := cell{x: 1, y: 1, conductivity: 0.9}
 	cells := []*cell{&heater, &conductor}
-	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 2, cells), makeConductivityPort(2, 2, cells))
+	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 2, cells), makeSetTemperaturePort(2, 2, cells), makeConductivityPort(2, 2, cells))
 
 	heat.Step()
 
@@ -77,7 +91,7 @@ func TestInsulatorNotHeated(t *testing.T) {
 	heater := cell{x: 0, y: 0, temperature: 0.1}
 	insulator := cell{x: 1, y: 0}
 	cells := []*cell{&heater, &insulator}
-	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
+	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeSetTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
 
 	heat.Step()
 
@@ -87,7 +101,7 @@ func TestInsulatorNotHeated(t *testing.T) {
 func TestNonConductingHeaterNotHeated(t *testing.T) {
 	heater := cell{x: 0, y: 0, temperature: 0.1}
 	cells := []*cell{&heater}
-	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
+	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeSetTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
 
 	heat.Step()
 
@@ -98,7 +112,7 @@ func TestCoolerCellDoesNotHeatMe(t *testing.T) {
 	warm := cell{x: 0, y: 0, temperature: 0.2}
 	cool := cell{x: 1, y: 0, temperature: 0.1}
 	cells := []*cell{&warm, &cool}
-	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
+	heat := NewHeatGrid(conductionEfficiency, makeTemperaturePort(2, 1, cells), makeSetTemperaturePort(2, 1, cells), makeConductivityPort(2, 1, cells))
 
 	heat.Step()
 
