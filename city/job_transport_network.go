@@ -22,14 +22,12 @@ func NewJobTransportNetwork(city *City) *JobTransportNetwork {
 		if y < 0 || y >= len(*city) || x < 0 || x >= len((*city)[0]) {
 			return 0, false
 		}
-		// TODO: Try making temperature unmodifiable for some cells; see if it negates need for non-cooling hack
 		return (*city)[y][x].Resources.Jobs, true
 	}
 	setTemperature := func(x int, y int, val float64) {
 		if y < 0 || y >= len(*city) || x < 0 || x >= len((*city)[0]) {
 			log.Panicf("setTemperature: out of bounds: (%d,%d)", x, y)
 		}
-		// TODO: Try making temperature unmodifiable for some cells; see if it negates need for non-cooling hack
 		(*city)[y][x].Resources.Jobs = val
 	}
 	getConductivity := func(x int, y int) (float64, bool) {

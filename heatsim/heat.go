@@ -7,10 +7,11 @@ import (
 
 // NewHeatGrid constructs a heat grid simulation.
 //
-// This is a simulation of heat flow in a 2-dimensional grid. The grid itself is not modeled here; it is only accessed
-// by coordinates through TemperaturePort and ConductivityPort. The heat flow algorithm will automatically probe the
-// boundaries of the grid without knowing its size; all it needs is for those two functions to return a float64 value (0
-// to 1 inclusive) for a given (x, y), or return nil if the coordinates are out of bounds.
+// This is a simulation of heat flow in a 2-dimensional grid, with some unrealistic modifications to make it more useful
+// in a game. The grid itself is not modeled here; it is only accessed by coordinates through the temperature and
+// conductivity interfaces. The heat flow algorithm will automatically probe the boundaries of the grid without knowing
+// its size; all it needs is for those two functions to return a float64 value (0 to 1 inclusive) for a given (x, y),
+// along with a bool indicating whether the coordinates are in bounds.
 //
 // efficiency (0 to 1 inclusive) is the proportion of heat that stays in the system as it flows from one cell to the
 // next.  The remainder is lost as waste. Efficiency manifests as the distance heat can travel before it is lost to
@@ -23,12 +24,12 @@ import (
 // be simulated: traffic transmitting over a road system, electricity transmitting over power lines, crime and pollution
 // radidating from their sources, etc.
 //
-// Surprising quirks:
+// Quirks:
 // * Conductivity only affects heat flowing into a cell, not out.
-// * While warm cells heat up cool cells, cool cells do not cool down warm cells. This enables heat to conduct over long
-//   distances, almost more like electricity.
+// * Cells absorb heat from neighboring warmer cells, but they do not lose it to cooler cells. This enables heat to
+//   conduct over long distances, almost more like electricity, especially over high-conductivity corridors.
 //
-// Source of the dumbed down math used here:
+// Source of the math used here:
 // https://demonstrations.wolfram.com/ACellularAutomatonBasedHeatEquation/
 //
 // Inspired by SimCity (SNES).
