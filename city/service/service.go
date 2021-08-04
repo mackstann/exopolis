@@ -1,4 +1,4 @@
-package adapters
+package service
 
 import (
 	"github.com/mackstann/exopolis/city"
