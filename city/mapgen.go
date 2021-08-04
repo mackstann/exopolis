@@ -31,15 +31,17 @@ func (g *MapGenerator) Generate() {
 		for x, letter := range row {
 			switch letter {
 			case 'H':
-				(*g.city)[y][x].Typ = House
+				g.city.Grid[y][x].Typ = House
 			case 'R':
-				(*g.city)[y][x].Typ = Road
+				g.city.Grid[y][x].Typ = Road
 			case 'F':
-				(*g.city)[y][x].Typ = Farm
-				(*g.city)[y][x].Resources.Jobs = 0.1
+				g.city.Grid[y][x].Typ = Farm
+				g.city.Grid[y][x].Resources.Jobs = 0.1
+				g.city.Grid[y][x].Resources.JobsSource = true
 			case 'P':
-				(*g.city)[y][x].Typ = PowerPlant
-				(*g.city)[y][x].Resources.Jobs = 1
+				g.city.Grid[y][x].Typ = PowerPlant
+				g.city.Grid[y][x].Resources.Jobs = 1
+				g.city.Grid[y][x].Resources.JobsSource = true
 			}
 		}
 	}

@@ -6,15 +6,13 @@ import (
 
 type CityService struct {
 	city   *city.City
-	zoning *city.ZoneMap
 	jobs   *city.JobsLayer
 	mapgen *city.MapGenerator
 }
 
-func NewCityService(c *city.City, zoning *city.ZoneMap, jobs *city.JobsLayer, mapgen *city.MapGenerator) *CityService {
+func NewCityService(c *city.City, jobs *city.JobsLayer, mapgen *city.MapGenerator) *CityService {
 	return &CityService{
 		city:   c,
-		zoning: zoning,
 		jobs:   jobs,
 		mapgen: mapgen,
 	}

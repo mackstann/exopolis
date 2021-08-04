@@ -17,7 +17,8 @@ const (
 )
 
 type Resources struct {
-	Jobs float64
+	Jobs       float64
+	JobsSource bool
 }
 
 type Cell struct {

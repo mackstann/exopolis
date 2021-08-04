@@ -22,11 +22,11 @@ func main() {
 	log.SetOutput(f)
 
 	const size = 20
-	city := cityDomain.NewCity(size)
 	zoning := cityDomain.NewZoneMap(size)
+	city := cityDomain.NewCity(size, zoning)
 	jobs := cityDomain.NewJobsLayer(city)
 
-	cityService := cityService.NewCityService(city, zoning, jobs, cityDomain.NewMapGenerator(city))
+	cityService := cityService.NewCityService(city, jobs, cityDomain.NewMapGenerator(city))
 	terminal := gameAdapters.NewTerminalAdapter()
 	renderer := gameAdapters.NewCityRenderer(city)
 

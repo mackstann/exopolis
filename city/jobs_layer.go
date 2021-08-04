@@ -19,23 +19,23 @@ const (
 
 func NewJobsLayer(city *City) *JobsLayer {
 	temperature := func(x int, y int) (float64, bool) {
-		if y < 0 || y >= len(*city) || x < 0 || x >= len((*city)[0]) {
+		if y < 0 || y >= len(city.Grid) || x < 0 || x >= len(city.Grid[0]) {
 			return 0, false
 		}
-		return (*city)[y][x].Resources.Jobs, true
+		return city.Grid[y][x].Resources.Jobs, true
 	}
 	setTemperature := func(x int, y int, val float64) {
-		if y < 0 || y >= len(*city) || x < 0 || x >= len((*city)[0]) {
+		if y < 0 || y >= len(city.Grid) || x < 0 || x >= len(city.Grid[0]) {
 			log.Panicf("setTemperature: out of bounds: (%d,%d)", x, y)
 		}
-		(*city)[y][x].Resources.Jobs = val
+		city.Grid[y][x].Resources.Jobs = val
 	}
 	getConductivity := func(x int, y int) (float64, bool) {
-		if y < 0 || y >= len(*city) || x < 0 || x >= len((*city)[0]) {
+		if y < 0 || y >= len(city.Grid) || x < 0 || x >= len(city.Grid[0]) {
 			return 0, false
 		}
 
-		switch (*city)[y][x].Typ {
+		switch city.Grid[y][x].Typ {
 		case Dirt:
 			return dirtConductivity, true
 		case Road:

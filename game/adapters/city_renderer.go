@@ -25,36 +25,36 @@ func (r *CityRenderer) Render() []string {
 }
 
 func textualize(c city.City) []string {
-	rows := make([]string, 0, len(c))
-	for y, row := range c {
+	rows := make([]string, 0, len(c.Grid))
+	for y, row := range c.Grid {
 		rowOutput := ""
 		for x, cell := range row {
-			temp255 := int(c[y][x].Resources.Jobs * 255.0)
+			temp255 := int(c.Grid[y][x].Resources.Jobs * 255.0)
 			intensity := fmt.Sprintf("%02x", temp255)
-			c := "."
+			chr := "."
 			color := ""
 			switch cell.Typ {
 			case city.House:
-				c = "■"
+				chr = "■"
 				color = intensity + "0000"
 			case city.Farm:
-				c = "▤"
+				chr = "▤"
 				color = "00" + intensity + "00"
 			case city.Road:
-				c = "▪"
+				chr = "▪"
 				color = intensity + intensity + intensity
 			case city.PowerPlant:
-				c = "p"
+				chr = "p"
 				color = intensity + intensity + "00"
 			case city.Dirt:
-				c = "░"
+				chr = "░"
 				color = "0000" + intensity
 			}
 			p := termenv.ColorProfile()
-			if intensity != "" && c != " " && len(color) == 6 {
-				rowOutput += termenv.String(c).Foreground(p.Color("#" + color)).String()
+			if intensity != "" && chr != " " && len(color) == 6 {
+				rowOutput += termenv.String(chr).Foreground(p.Color("#" + color)).String()
 			} else {
-				rowOutput += c
+				rowOutput += chr
 			}
 		}
 		rows = append(rows, rowOutput)
