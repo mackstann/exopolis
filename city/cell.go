@@ -10,7 +10,8 @@ const (
 	PowerLine = 101
 
 	House = 200
-	Farm  = 201
+	// TODO: farm doesn't make sense in a city
+	Farm = 201
 
 	PowerPlant = 300
 )
