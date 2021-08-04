@@ -11,6 +11,8 @@ import (
 	gameAdapters "github.com/mackstann/exopolis/game/adapters"
 )
 
+// TODO: day/night cycle with coloration... or sun visualization
+
 func main() {
 	f, err := os.OpenFile("exopolis.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
@@ -21,10 +23,9 @@ func main() {
 
 	city := cityDomain.NewCity(20)
 
-	// problem: heat grid is now operating on an irrelevant grid
-	network := cityDomain.NewJobTransportNetwork(city)
+	jobs := cityDomain.NewJobsLayer(city)
 
-	cityService := cityService.NewCityService(city, network, cityDomain.NewMapGenerator(city))
+	cityService := cityService.NewCityService(city, jobs, cityDomain.NewMapGenerator(city))
 	terminal := gameAdapters.NewTerminalAdapter()
 	renderer := gameAdapters.NewCityRenderer(city)
 

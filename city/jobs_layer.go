@@ -6,7 +6,7 @@ import (
 	"github.com/mackstann/exopolis/heatsim"
 )
 
-type JobTransportNetwork struct {
+type JobsLayer struct {
 	city *City
 	*heatsim.HeatGrid
 }
@@ -17,7 +17,7 @@ const (
 	defaultConductivity         = 0.0
 )
 
-func NewJobTransportNetwork(city *City) *JobTransportNetwork {
+func NewJobsLayer(city *City) *JobsLayer {
 	temperature := func(x int, y int) (float64, bool) {
 		if y < 0 || y >= len(*city) || x < 0 || x >= len((*city)[0]) {
 			return 0, false
@@ -46,7 +46,7 @@ func NewJobTransportNetwork(city *City) *JobTransportNetwork {
 	}
 	const efficiency = 0.9
 	heat := heatsim.NewHeatGrid(efficiency, temperature, setTemperature, getConductivity)
-	return &JobTransportNetwork{
+	return &JobsLayer{
 		city:     city,
 		HeatGrid: heat,
 	}

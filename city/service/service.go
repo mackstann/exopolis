@@ -5,21 +5,21 @@ import (
 )
 
 type CityService struct {
-	city    *city.City
-	network *city.JobTransportNetwork
-	mapgen  *city.MapGenerator
+	city   *city.City
+	jobs   *city.JobsLayer
+	mapgen *city.MapGenerator
 }
 
-func NewCityService(c *city.City, network *city.JobTransportNetwork, mapgen *city.MapGenerator) *CityService {
+func NewCityService(c *city.City, jobs *city.JobsLayer, mapgen *city.MapGenerator) *CityService {
 	return &CityService{
-		city:    c,
-		network: network,
-		mapgen:  mapgen,
+		city:   c,
+		jobs:   jobs,
+		mapgen: mapgen,
 	}
 }
 
 func (a *CityService) Step() {
-	a.network.Step()
+	a.jobs.Step()
 }
 
 func (a *CityService) GenerateMap() {
