@@ -22,7 +22,7 @@ type cell struct {
 	conductivity float64
 }
 
-func makeTemperaturePort(width int, height int, cells []*cell) TemperaturePort {
+func makeTemperaturePort(width int, height int, cells []*cell) TemperatureGetter {
 	return func(x int, y int) (float64, bool) {
 		if x < 0 || x >= width || y < 0 || y >= height {
 			return 0, false
@@ -36,7 +36,7 @@ func makeTemperaturePort(width int, height int, cells []*cell) TemperaturePort {
 	}
 }
 
-func makeSetTemperaturePort(width int, height int, cells []*cell) SetTemperaturePort {
+func makeSetTemperaturePort(width int, height int, cells []*cell) TemperatureSetter {
 	return func(x int, y int, val float64) {
 		if x < 0 || x >= width || y < 0 || y >= height {
 			log.Panicf("set temp out of bounds: (%d,%d)", x, y)
@@ -49,7 +49,7 @@ func makeSetTemperaturePort(width int, height int, cells []*cell) SetTemperature
 	}
 }
 
-func makeConductivityPort(width int, height int, cells []*cell) ConductivityPort {
+func makeConductivityPort(width int, height int, cells []*cell) ConductivityGetter {
 	return func(x int, y int) (float64, bool) {
 		if x < 0 || x >= width || y < 0 || y >= height {
 			return 0, false

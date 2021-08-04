@@ -33,7 +33,7 @@ import (
 // https://demonstrations.wolfram.com/ACellularAutomatonBasedHeatEquation/
 //
 // Inspired by SimCity (SNES).
-func NewHeatGrid(efficiency float64, temp TemperaturePort, setTemp SetTemperaturePort, cond ConductivityPort) *HeatGrid {
+func NewHeatGrid(efficiency float64, temp TemperatureGetter, setTemp TemperatureSetter, cond ConductivityGetter) *HeatGrid {
 	return &HeatGrid{
 		efficiency:     efficiency,
 		temperature:    temp,
@@ -44,14 +44,14 @@ func NewHeatGrid(efficiency float64, temp TemperaturePort, setTemp SetTemperatur
 
 type HeatGrid struct {
 	efficiency     float64
-	temperature    TemperaturePort
-	setTemperature SetTemperaturePort
-	conductivity   ConductivityPort
+	temperature    TemperatureGetter
+	setTemperature TemperatureSetter
+	conductivity   ConductivityGetter
 }
 
-type TemperaturePort func(x int, y int) (float64, bool)
-type SetTemperaturePort func(x int, y int, val float64)
-type ConductivityPort func(x int, y int) (float64, bool)
+type TemperatureGetter func(x int, y int) (float64, bool)
+type TemperatureSetter func(x int, y int, val float64)
+type ConductivityGetter func(x int, y int) (float64, bool)
 
 func (n HeatGrid) Step() {
 	for y := 0; ; y++ {
