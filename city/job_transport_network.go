@@ -44,9 +44,6 @@ func NewJobTransportNetwork(city *City) *JobTransportNetwork {
 			return defaultConductivity, true
 		}
 	}
-	// TODO: pointer makes reads vs. writes mysterious
-	// Use getter/setter. Conductivity only needs getter.
-	// return secondary bool value in place of nil
 	const efficiency = 0.9
 	heat := heatsim.NewHeatGrid(efficiency, temperature, setTemperature, getConductivity)
 	return &JobTransportNetwork{
