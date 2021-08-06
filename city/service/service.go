@@ -20,6 +20,7 @@ func NewCityService(c *city.City, jobs *city.JobsLayer, mapgen *city.MapGenerato
 
 func (a *CityService) Step() {
 	a.jobs.Step()
+	a.city.Step()
 }
 
 func (a *CityService) GenerateMap() {
