@@ -22,8 +22,6 @@ func NewCity(size int, zoning *ZoneMap) *City {
 	}
 }
 
-// TODO: call Step()
-// TODO: add zoning map generator
 func (c *City) Step() {
 	for y, row := range c.Grid {
 		for x, cell := range c.Grid[y] {

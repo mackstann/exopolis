@@ -29,6 +29,7 @@ func main() {
 	cityService := cityService.NewCityService(city, jobs, cityDomain.NewMapGenerator(city))
 	terminal := gameAdapters.NewTerminalAdapter()
 	renderer := gameAdapters.NewCityRenderer(city)
+	g := game.NewGame(terminal)
 
 	cityService.GenerateMap()
 	log.Println("game Run loop")
@@ -40,8 +41,11 @@ func main() {
 		t := time.Now()
 		for _, ev := range terminal.GetInputEventsNonBlocking() {
 			if ev == game.QuitEvent {
+				// TODO: move into game
 				terminal.Shutdown()
 				return
+			} else {
+				g.HandleInput(ev)
 			}
 		}
 		tickDelta := t.Sub(lastTick)
