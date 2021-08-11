@@ -29,7 +29,7 @@ func main() {
 	cityService := cityService.NewCityService(city, jobs, cityDomain.NewMapGenerator(city))
 	terminal := gameAdapters.NewTerminalAdapter()
 	renderer := gameAdapters.NewCityRenderer(city)
-	g := game.NewGame(terminal)
+	g := game.NewGame(cityService, terminal)
 
 	cityService.GenerateMap()
 	log.Println("game Run loop")

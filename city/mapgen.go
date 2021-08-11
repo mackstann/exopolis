@@ -25,7 +25,7 @@ func (g *MapGenerator) Generate() {
 		for x, letter := range row {
 			switch letter {
 			case 'R':
-				g.city.Zoning.setZone(x, y, ResidentialZone)
+				g.city.Zoning.SetZone(x, y, ResidentialZone)
 			}
 		}
 	}

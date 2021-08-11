@@ -23,6 +23,6 @@ func (z *ZoneMap) zoneAt(x int, y int) ZoneType {
 	return (*z)[y][x]
 }
 
-func (z *ZoneMap) setZone(x int, y int, zt ZoneType) {
+func (z *ZoneMap) SetZone(x int, y int, zt ZoneType) {
 	(*z)[y][x] = zt
 }

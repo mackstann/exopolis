@@ -12,20 +12,29 @@ const (
 	CursorDown
 	CursorLeft
 	CursorRight
+	BuildResidential
 )
 
 type Game struct {
+	build   BuildPort
 	view    ViewPort
 	cursorX int
 	cursorY int
+}
+
+type BuildPort interface {
+	BuildResidential(x, y int)
 }
 
 type ViewPort interface {
 	MoveCursor(x, y int)
 }
 
-func NewGame(view ViewPort) *Game {
-	return &Game{view: view}
+func NewGame(build BuildPort, view ViewPort) *Game {
+	return &Game{
+		build: build,
+		view:  view,
+	}
 }
 
 func (g *Game) HandleInput(ev InputEvent) {
@@ -51,6 +60,8 @@ func (g *Game) HandleInput(ev InputEvent) {
 			g.cursorX++
 			g.view.MoveCursor(g.cursorX, g.cursorY)
 		}
+	case BuildResidential:
+		g.build.BuildResidential(g.cursorX, g.cursorY)
 	}
 	// TODO: a game renderer that composites this on top...
 	// except... can't use background as cursor if we composite like that

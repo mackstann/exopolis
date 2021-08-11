@@ -96,6 +96,9 @@ func (a *TerminalAdapter) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 		case "l":
 			a.inputEvents <- game.CursorRight
 			return a, nil
+		case "r":
+			a.inputEvents <- game.BuildResidential
+			return a, nil
 		}
 	case quitRequest:
 		return a, tea.Quit
