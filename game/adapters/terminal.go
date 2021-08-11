@@ -14,7 +14,7 @@ type TerminalAdapter struct {
 	drawRequests chan struct{}
 	quitRequest  chan struct{}
 	quitComplete chan struct{}
-	city         []string
+	city         [][]string
 	cursorX      int
 	cursorY      int
 }
@@ -105,10 +105,14 @@ func (a *TerminalAdapter) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 
 func (a *TerminalAdapter) View() string {
 	log.Println("tui View()")
-	return strings.Join(a.compositeLayers(), "\n")
+	out := []string{}
+	for _, row := range a.compositeLayers() {
+		out = append(out, strings.Join(row, ""))
+	}
+	return strings.Join(out, "\n")
 }
 
-func (a *TerminalAdapter) UpdateCity(city []string) {
+func (a *TerminalAdapter) UpdateCity(city [][]string) {
 	log.Println("tui getting new rendered city")
 	a.city = city
 }
@@ -132,17 +136,16 @@ func (a *TerminalAdapter) MoveCursor(x, y int) {
 	a.cursorY = y
 }
 
-func (a *TerminalAdapter) compositeLayers() []string {
+func (a *TerminalAdapter) compositeLayers() [][]string {
 	if len(a.city) == 0 {
 		return a.city
 	}
-	output := make([]string, len(a.city))
+	output := make([][]string, len(a.city))
 	copy(output, a.city)
 
 	row := output[a.cursorY]
-	runes := []rune(row)
-	runes[a.cursorX] = '◸'
-	output[a.cursorY] = string(runes)
+	row[a.cursorX] = "◸"
+	output[a.cursorY] = row
 
 	return output
 }
