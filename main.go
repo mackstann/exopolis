@@ -21,7 +21,7 @@ func main() {
 	defer f.Close()
 	log.SetOutput(f)
 
-	const size = 20
+	const size = 4
 	zoning := cityDomain.NewZoneMap(size)
 	city := cityDomain.NewCity(size, zoning)
 	jobs := cityDomain.NewJobsLayer(city)

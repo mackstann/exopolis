@@ -25,12 +25,19 @@ func NewCity(size int, zoning *ZoneMap) *City {
 func (c *City) Step() {
 	for y, row := range c.Grid {
 		for x, cell := range c.Grid[y] {
-			if c.Zoning.zoneAt(x, y) == ResidentialZone &&
-				cell.Typ == Dirt &&
-				cell.Resources.Jobs > 0.1 {
-				r := rand.Float64()
-				if r < 0.001 {
-					row[x].Typ = House
+			if c.Zoning.zoneAt(x, y) == ResidentialZone {
+				if cell.Typ == Dirt &&
+					cell.Resources.Jobs > 0.1 {
+					r := rand.Float64()
+					if r < 0.001 {
+						row[x].Typ = House
+					}
+				} else if cell.Typ == House &&
+					cell.Resources.Jobs <= 0.1 {
+					r := rand.Float64()
+					if r < 0.001 {
+						row[x].Typ = Dirt
+					}
 				}
 			}
 		}

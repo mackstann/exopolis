@@ -63,19 +63,20 @@ func (n HeatGrid) Step() {
 				}
 				break // end of line
 			}
+			conductivity, hasConductivity := n.conductivity(x, y)
+			if !hasConductivity {
+				log.Panicf("already checked cell (%d,%d); should always have conductivity", x, y)
+			}
 			x90, y90 := n.neighbors90(x, y)
 			x45, y45 := n.neighbors45(x, y)
-			influx90, influxors90 := n.calcWeightedInflux(myTemp, x90, y90, 1)
-			influx45, influxors45 := n.calcWeightedInflux(myTemp, x45, y45, 1.0/4)
+			influx90, influxors90 := n.calcWeightedInflux(myTemp, conductivity, x90, y90, 1)
+			influx45, influxors45 := n.calcWeightedInflux(myTemp, conductivity, x45, y45, 1.0/4)
 
 			if influxors90 > 0 || influxors45 > 0 {
-				ambientTemp := (influx90 + influx45) / (influxors90 + influxors45)
-				tempDelta := ambientTemp - myTemp
-				conductivity, hasConductivity := n.conductivity(x, y)
-				if !hasConductivity {
-					log.Panicf("already checked cell (%d,%d); should always have conductivity", x, y)
-				}
-				myTemp += tempDelta * conductivity
+				log.Printf("myTemp is %v", myTemp)
+				log.Printf("influx %v, influxors %v", (influx90 + influx45), (influxors90 + influxors45))
+				log.Printf("add weighted influx %v", (influx90+influx45)/(influxors90+influxors45))
+				myTemp += (influx90 + influx45) / (influxors90 + influxors45)
 				myTemp = math.Min(1, myTemp)
 				myTemp = math.Max(0, myTemp)
 				n.setTemperature(x, y, myTemp)
@@ -84,14 +85,19 @@ func (n HeatGrid) Step() {
 	}
 }
 
-func (n HeatGrid) calcWeightedInflux(myTemp float64, x []int, y []int, weight float64) (influx float64, influxors float64) {
+func (n HeatGrid) calcWeightedInflux(myTemp float64, myConductivity float64, x []int, y []int, weight float64) (influx float64, influxors float64) {
 	for i := range x {
 		cx := x[i]
 		cy := y[i]
 		temp, hasTemp := n.temperature(cx, cy)
-		if hasTemp && temp > myTemp {
-			influx += (temp * n.efficiency) * weight
-			influxors += 1 * weight
+		cond, hasCond := n.conductivity(cx, cy)
+		if temp != 0 {
+			log.Printf("found temp %f BUT hasTemp %v, cond %f, hasCond %v", temp, hasTemp, cond, hasCond)
+		}
+		if hasTemp && hasCond && myConductivity > 0 && cond > 0 {
+			log.Printf("influx calc %f %f %v %v %v", temp, myTemp, n.efficiency, seriesConductivity(myConductivity, cond), weight)
+			influx += ((temp - myTemp) * n.efficiency) * seriesConductivity(myConductivity, cond) * weight
+			influxors += weight
 		}
 	}
 	return influx, influxors
@@ -105,4 +111,11 @@ func (n HeatGrid) neighbors90(x int, y int) ([]int, []int) {
 func (n HeatGrid) neighbors45(x int, y int) ([]int, []int) {
 	return []int{x - 1, x - 1, x + 1, x + 1},
 		[]int{y - 1, y + 1, y - 1, y + 1}
+}
+
+func seriesConductivity(c1 float64, c2 float64) float64 {
+	if c1 == 0 || c2 == 0 {
+		return 0
+	}
+	return (c1 * c2) / (c1 + c2)
 }

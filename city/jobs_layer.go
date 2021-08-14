@@ -12,23 +12,28 @@ type JobsLayer struct {
 }
 
 const (
-	dirtConductivity    float64 = 0.1
-	roadConductivity            = 0.9
-	defaultConductivity         = 0.0
+	dirtConductivity       float64 = 0.1
+	roadConductivity               = 0.9
+	powerPlantConductivity         = 0.9
+	defaultConductivity            = 0.0
 )
 
 func NewJobsLayer(city *City) *JobsLayer {
 	temperature := func(x int, y int) (float64, bool) {
 		if y < 0 || y >= len(city.Grid) || x < 0 || x >= len(city.Grid[0]) {
+			log.Printf("temperature getter OOB 0")
 			return 0, false
 		}
+		log.Printf("temperature getter %f", city.Grid[y][x].Resources.Jobs)
 		return city.Grid[y][x].Resources.Jobs, true
 	}
 	setTemperature := func(x int, y int, val float64) {
 		if y < 0 || y >= len(city.Grid) || x < 0 || x >= len(city.Grid[0]) {
 			log.Panicf("setTemperature: out of bounds: (%d,%d)", x, y)
 		}
-		city.Grid[y][x].Resources.Jobs = val
+		if !city.Grid[y][x].Resources.JobsSource {
+			city.Grid[y][x].Resources.Jobs = val
+		}
 	}
 	getConductivity := func(x int, y int) (float64, bool) {
 		if y < 0 || y >= len(city.Grid) || x < 0 || x >= len(city.Grid[0]) {
@@ -40,6 +45,8 @@ func NewJobsLayer(city *City) *JobsLayer {
 			return dirtConductivity, true
 		case Road:
 			return roadConductivity, true
+		case PowerPlant:
+			return powerPlantConductivity, true
 		default:
 			return defaultConductivity, true
 		}

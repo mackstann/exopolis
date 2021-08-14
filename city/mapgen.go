@@ -14,7 +14,7 @@ type MapGenerator struct {
 
 func (g *MapGenerator) Generate() {
 	zones := []string{
-		"RRR        ",
+		"           ",
 		"RRR        ",
 		"RRR        ",
 		"           ",
@@ -32,7 +32,7 @@ func (g *MapGenerator) Generate() {
 
 	// cells default to dirt
 	city := []string{
-		"   R   PFFF",
+		"PRRR   PFFF",
 		"   R  FRFFF",
 		"   R  FRFFF",
 		"RRRR  FRFFF",
@@ -46,6 +46,9 @@ func (g *MapGenerator) Generate() {
 
 	for y, row := range city {
 		for x, letter := range row {
+			if y >= len(g.city.Grid) || x >= len(g.city.Grid[0]) {
+				continue
+			}
 			switch letter {
 			case 'H':
 				g.city.Grid[y][x].Typ = House
