@@ -13,29 +13,16 @@ import (
 // its size; all it needs is for those two functions to return a float64 value (0 to 1 inclusive) for a given (x, y),
 // along with a bool indicating whether the coordinates are in bounds.
 //
-// efficiency (0 to 1 inclusive) is the proportion of heat that stays in the system as it flows from one cell to the
-// next.  The remainder is lost as waste. Efficiency manifests as the distance heat can travel before it is lost to
-// decay.
-//
 // The values returned by conductivityPort control the rate of heat flow into a given cell. Heat flow out is
 // unrestricted. Conductivity manifests as the speed at which heat flows between cells.
 //
-// By tuning the efficiency of the grid and the temperature and conductivity of cells, different city-like phenomena can
-// be simulated: traffic transmitting over a road system, electricity transmitting over power lines, crime and pollution
-// radidating from their sources, etc.
-//
-// Quirks:
-// * Conductivity only affects heat flowing into a cell, not out.
-// * Cells absorb heat from neighboring warmer cells, but they do not lose it to cooler cells. This enables heat to
-//   conduct over long distances, almost more like electricity, especially over high-conductivity corridors.
-//
-// Source of the math used here:
-// https://demonstrations.wolfram.com/ACellularAutomatonBasedHeatEquation/
+// By tuning the temperature and conductivity of cells, different city-like phenomena can be simulated: traffic
+// transmitting over a road system, electricity transmitting over power lines, crime and pollution radidating from their
+// sources, etc.
 //
 // Inspired by SimCity (SNES).
-func NewHeatGrid(efficiency float64, temp TemperatureGetter, setTemp TemperatureSetter, cond ConductivityGetter) *HeatGrid {
+func NewHeatGrid(temp TemperatureGetter, setTemp TemperatureSetter, cond ConductivityGetter) *HeatGrid {
 	return &HeatGrid{
-		efficiency:     efficiency,
 		temperature:    temp,
 		setTemperature: setTemp,
 		conductivity:   cond,
@@ -43,7 +30,6 @@ func NewHeatGrid(efficiency float64, temp TemperatureGetter, setTemp Temperature
 }
 
 type HeatGrid struct {
-	efficiency     float64
 	temperature    TemperatureGetter
 	setTemperature TemperatureSetter
 	conductivity   ConductivityGetter
@@ -95,8 +81,11 @@ func (n HeatGrid) calcWeightedInflux(myTemp float64, myConductivity float64, x [
 			log.Printf("found temp %f BUT hasTemp %v, cond %f, hasCond %v", temp, hasTemp, cond, hasCond)
 		}
 		if hasTemp && hasCond && myConductivity > 0 && cond > 0 {
-			log.Printf("influx calc %f %f %v %v %v", temp, myTemp, n.efficiency, seriesConductivity(myConductivity, cond), weight)
-			influx += ((temp - myTemp) * n.efficiency) * seriesConductivity(myConductivity, cond) * weight
+			log.Printf("influx calc %f %f %v %v", temp, myTemp, seriesConductivity(myConductivity, cond), weight)
+			limitingConductivity := math.Max(myConductivity, cond)
+			goalTemp := temp * limitingConductivity
+			deltaTemp := goalTemp - myTemp
+			influx += deltaTemp * weight * seriesConductivity(myConductivity, cond)
 			influxors += weight
 		}
 	}

@@ -13,7 +13,7 @@ type JobsLayer struct {
 
 const (
 	dirtConductivity       float64 = 0.1
-	roadConductivity               = 0.9
+	roadConductivity               = 0.999
 	powerPlantConductivity         = 0.9
 	defaultConductivity            = 0.0
 )
@@ -51,8 +51,7 @@ func NewJobsLayer(city *City) *JobsLayer {
 			return defaultConductivity, true
 		}
 	}
-	const efficiency = 0.9
-	heat := heatsim.NewHeatGrid(efficiency, temperature, setTemperature, getConductivity)
+	heat := heatsim.NewHeatGrid(temperature, setTemperature, getConductivity)
 	return &JobsLayer{
 		city:     city,
 		HeatGrid: heat,

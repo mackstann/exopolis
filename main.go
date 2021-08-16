@@ -35,7 +35,7 @@ func main() {
 	log.Println("game Run loop")
 
 	frameInterval := time.Duration(time.Second / 30.0)
-	engineTickInterval := time.Duration(time.Second / 30.0)
+	engineTickInterval := time.Duration(time.Second / 240.0)
 	lastTick := time.Now()
 	for {
 		t := time.Now()
