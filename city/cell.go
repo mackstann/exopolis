@@ -25,3 +25,35 @@ type Cell struct {
 	Typ       CellType
 	Resources Resources
 }
+
+func NewDirt() Cell {
+	return Cell{Typ: Dirt}
+}
+
+func NewHouse() Cell {
+	return Cell{Typ: House}
+}
+
+func NewRoad() Cell {
+	return Cell{Typ: Road}
+}
+
+func NewFarm() Cell {
+	return Cell{
+		Typ: Farm,
+		Resources: Resources{
+			Jobs:       0.1,
+			JobsSource: true,
+		},
+	}
+}
+
+func NewPowerPlant() Cell {
+	return Cell{
+		Typ: PowerPlant,
+		Resources: Resources{
+			Jobs:       1,
+			JobsSource: true,
+		},
+	}
+}

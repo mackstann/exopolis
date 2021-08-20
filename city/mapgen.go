@@ -51,17 +51,13 @@ func (g *MapGenerator) Generate() {
 			}
 			switch letter {
 			case 'H':
-				g.city.Grid[y][x].Typ = House
+				g.city.Grid[y][x] = NewHouse()
 			case 'R':
-				g.city.Grid[y][x].Typ = Road
+				g.city.Grid[y][x] = NewRoad()
 			case 'F':
-				g.city.Grid[y][x].Typ = Farm
-				g.city.Grid[y][x].Resources.Jobs = 0.1
-				g.city.Grid[y][x].Resources.JobsSource = true
+				g.city.Grid[y][x] = NewFarm()
 			case 'P':
-				g.city.Grid[y][x].Typ = PowerPlant
-				g.city.Grid[y][x].Resources.Jobs = 1
-				g.city.Grid[y][x].Resources.JobsSource = true
+				g.city.Grid[y][x] = NewPowerPlant()
 			}
 		}
 	}

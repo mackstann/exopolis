@@ -29,8 +29,5 @@ func (a *CityService) GenerateMap() {
 
 func (a *CityService) BuildResidential(x, y int) {
 	a.city.Zoning.SetZone(x, y, city.ResidentialZone)
-	// TODO: centralize this stuff!
-	a.city.Grid[y][x].Typ = city.Dirt
-	a.city.Grid[y][x].Resources.Jobs = 0
-	a.city.Grid[y][x].Resources.JobsSource = false
+	a.city.Grid[y][x] = city.NewDirt()
 }
