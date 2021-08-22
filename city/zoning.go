@@ -19,7 +19,7 @@ func NewZoneMap(size int) *ZoneMap {
 	return &zmap
 }
 
-func (z *ZoneMap) zoneAt(x int, y int) ZoneType {
+func (z *ZoneMap) ZoneAt(x int, y int) ZoneType {
 	return (*z)[y][x]
 }
 

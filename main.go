@@ -21,6 +21,9 @@ import (
  *     runaway effects.
  *
  * +growth -> +traffic -> -growth
+ *
+ * layers support a common interface so we can easily examine them in a sort of automated way
+ *
  */
 
 func main() {
