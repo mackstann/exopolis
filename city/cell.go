@@ -16,14 +16,8 @@ const (
 	PowerPlant = 300
 )
 
-type Resources struct {
-	Jobs       float64
-	JobsSource bool
-}
-
 type Cell struct {
-	Typ       CellType
-	Resources Resources
+	Typ CellType
 }
 
 func NewDirt() Cell {
@@ -39,21 +33,9 @@ func NewRoad() Cell {
 }
 
 func NewFarm() Cell {
-	return Cell{
-		Typ: Farm,
-		Resources: Resources{
-			Jobs:       0.1,
-			JobsSource: true,
-		},
-	}
+	return Cell{Typ: Farm}
 }
 
 func NewPowerPlant() Cell {
-	return Cell{
-		Typ: PowerPlant,
-		Resources: Resources{
-			Jobs:       1,
-			JobsSource: true,
-		},
-	}
+	return Cell{Typ: PowerPlant}
 }

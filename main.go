@@ -13,6 +13,16 @@ import (
 
 // TODO: day/night cycle with coloration... or sun visualization
 
+/* New approach... layers:
+ * 1: build/input layer: what the player asked to build (includes zones)
+ *   * currently called the city, but this is not accurate
+ * 2..N: reaction layers -- electricity, traffic, houses etc.
+ *   * these can have circular dependencies, but when they do, they should have a dampening effect so there aren't
+ *     runaway effects.
+ *
+ * +growth -> +traffic -> -growth
+ */
+
 func main() {
 	f, err := os.OpenFile("exopolis.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
@@ -28,7 +38,7 @@ func main() {
 
 	cityService := cityService.NewCityService(city, jobs, cityDomain.NewMapGenerator(city))
 	terminal := gameAdapters.NewTerminalAdapter()
-	renderer := gameAdapters.NewCityRenderer(city)
+	renderer := gameAdapters.NewCityRenderer(city, jobs)
 	g := game.NewGame(cityService, terminal)
 
 	cityService.GenerateMap()

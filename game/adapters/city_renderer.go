@@ -2,7 +2,7 @@ package adapters
 
 import (
 	"fmt"
-	_ "log"
+	"log"
 
 	"github.com/mackstann/exopolis/city"
 
@@ -11,11 +11,13 @@ import (
 
 type CityRenderer struct {
 	city *city.City
+	jobs *city.JobsLayer
 }
 
-func NewCityRenderer(c *city.City) *CityRenderer {
+func NewCityRenderer(c *city.City, jobs *city.JobsLayer) *CityRenderer {
 	return &CityRenderer{
 		city: c,
+		jobs: jobs,
 	}
 }
 
@@ -25,7 +27,9 @@ func (r *CityRenderer) Render() [][]string {
 	for y, row := range c.Grid {
 		rowOutput := make([]string, 0, len(c.Grid[y]))
 		for x, cell := range row {
-			temp255 := int(c.Grid[y][x].Resources.Jobs * 255.0)
+			log.Printf("render %d %d", x, y)
+			log.Printf("r.jobs %v", r.jobs)
+			temp255 := int(r.jobs.Grid[y][x] * 255.0)
 			intensity := fmt.Sprintf("%02x", temp255)
 			chr := "."
 			color := ""

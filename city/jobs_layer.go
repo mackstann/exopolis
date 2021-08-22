@@ -9,7 +9,10 @@ import (
 type JobsLayer struct {
 	city *City
 	*heatsim.HeatGrid
+	Grid JobsGrid
 }
+
+type JobsGrid [][]float64
 
 const (
 	dirtConductivity       float64 = 0.1
@@ -19,24 +22,40 @@ const (
 )
 
 func NewJobsLayer(city *City) *JobsLayer {
+	j := &JobsLayer{
+		city: city,
+		Grid: make([][]float64, 0, len(city.Grid)),
+	}
+
+	for range city.Grid {
+		j.Grid = append(j.Grid, make([]float64, len(city.Grid[0])))
+	}
+	log.Printf("%v", j.Grid)
+
 	temperature := func(x int, y int) (float64, bool) {
-		if y < 0 || y >= len(city.Grid) || x < 0 || x >= len(city.Grid[0]) {
+		if y < 0 || y >= len(j.Grid) || x < 0 || x >= len(j.Grid[0]) {
 			log.Printf("temperature getter OOB 0")
 			return 0, false
 		}
-		log.Printf("temperature getter %f", city.Grid[y][x].Resources.Jobs)
-		return city.Grid[y][x].Resources.Jobs, true
+		log.Printf("temperature getter %f", j.Grid[y][x])
+		switch city.Grid[y][x].Typ {
+		case Farm:
+			return 0.1, true
+		case PowerPlant:
+			return 1, true
+		}
+		return j.Grid[y][x], true
 	}
 	setTemperature := func(x int, y int, val float64) {
-		if y < 0 || y >= len(city.Grid) || x < 0 || x >= len(city.Grid[0]) {
+		if y < 0 || y >= len(j.Grid) || x < 0 || x >= len(j.Grid[0]) {
 			log.Panicf("setTemperature: out of bounds: (%d,%d)", x, y)
 		}
-		if !city.Grid[y][x].Resources.JobsSource {
-			city.Grid[y][x].Resources.Jobs = val
+		if city.Grid[y][x].Typ != Farm && city.Grid[y][x].Typ != PowerPlant {
+			j.Grid[y][x] = val
 		}
 	}
 	getConductivity := func(x int, y int) (float64, bool) {
-		if y < 0 || y >= len(city.Grid) || x < 0 || x >= len(city.Grid[0]) {
+		if y < 0 || y >= len(j.Grid) || x < 0 || x >= len(j.Grid[0]) {
 			return 0, false
 		}
 
@@ -51,9 +70,6 @@ func NewJobsLayer(city *City) *JobsLayer {
 			return defaultConductivity, true
 		}
 	}
-	heat := heatsim.NewHeatGrid(temperature, setTemperature, getConductivity)
-	return &JobsLayer{
-		city:     city,
-		HeatGrid: heat,
-	}
+	j.HeatGrid = heatsim.NewHeatGrid(temperature, setTemperature, getConductivity)
+	return j
 }
