@@ -9,9 +9,11 @@ const (
 	Road      = 100
 	PowerLine = 101
 
-	House = 200
-	// TODO: farm doesn't make sense in a city
-	Farm = 201
+	ResidentialZone = 200
+	House           = 201
 
-	PowerPlant = 300
+	// TODO: farm doesn't make sense in a city
+	Farm = 300
+
+	PowerPlant = 400
 )

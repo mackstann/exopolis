@@ -1,6 +1,7 @@
 package service
 
 import (
+	"log"
 	"math/rand"
 
 	"github.com/mackstann/exopolis/city"
@@ -35,8 +36,7 @@ func (a *CityService) GenerateMap() {
 }
 
 func (a *CityService) BuildResidential(x, y int) {
-	a.city.Zoning.SetZone(x, y, city.ResidentialZone)
-	a.city.Grid[y][x] = city.Dirt
+	a.city.Grid[y][x] = city.ResidentialZone
 }
 
 func occasionally() bool {
@@ -49,17 +49,17 @@ func (a *CityService) StepCell(x, y int) {
 	// move this logic into a rule...
 	// needs to know about zoning AND cells...
 	// it's a separate thing..? implemented by the city
-	if a.city.Zoning.ZoneAt(x, y) == city.ResidentialZone {
-		if cell == city.Dirt &&
-			a.jobs.Grid[y][x] > 0.1 {
-			if occasionally() {
-				row[x] = city.House
-			}
-		} else if cell == city.House &&
-			a.jobs.Grid[y][x] <= 0.1 {
-			if occasionally() {
-				row[x] = city.Dirt
-			}
+	if cell == city.ResidentialZone &&
+		a.jobs.Grid[y][x] > 0.1 {
+		log.Printf("grow")
+		if occasionally() {
+			row[x] = city.House
+		}
+	} else if cell == city.House &&
+		a.jobs.Grid[y][x] <= 0.1 {
+		if occasionally() {
+			log.Printf("ungrow")
+			row[x] = city.ResidentialZone
 		}
 	}
 }

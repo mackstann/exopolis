@@ -13,28 +13,11 @@ type MapGenerator struct {
 }
 
 func (g *MapGenerator) Generate() {
-	zones := []string{
-		"           ",
-		"RRR        ",
-		"RRR        ",
-		"           ",
-		"           ",
-		"           ",
-	}
-	for y, row := range zones {
-		for x, letter := range row {
-			switch letter {
-			case 'R':
-				g.city.Zoning.SetZone(x, y, ResidentialZone)
-			}
-		}
-	}
-
 	// cells default to dirt
 	city := []string{
 		"PRRR   PFFF",
-		"   R  FRFFF",
-		"   R  FRFFF",
+		"rrrR  FRFFF",
+		"rrrR  FRFFF",
 		"RRRR  FRFFF",
 		"  RRRRRRRRF",
 		"FFFFFFFFFFF",
@@ -52,6 +35,8 @@ func (g *MapGenerator) Generate() {
 			switch letter {
 			case 'H':
 				g.city.Grid[y][x] = House
+			case 'r':
+				g.city.Grid[y][x] = ResidentialZone
 			case 'R':
 				g.city.Grid[y][x] = Road
 			case 'F':

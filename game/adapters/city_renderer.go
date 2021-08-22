@@ -34,6 +34,9 @@ func (r *CityRenderer) Render() [][]string {
 			chr := "."
 			color := ""
 			switch cell {
+			case city.ResidentialZone:
+				chr = "■"
+				color = intensity + "4444"
 			case city.House:
 				chr = "■"
 				color = intensity + "0000"
@@ -45,7 +48,7 @@ func (r *CityRenderer) Render() [][]string {
 				color = intensity + intensity + intensity
 			case city.PowerPlant:
 				chr = "p"
-				color = intensity + intensity + "00"
+				color = "ffff00"
 			case city.Dirt:
 				chr = "░"
 				color = "0000" + intensity
