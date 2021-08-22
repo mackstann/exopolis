@@ -1,10 +1,10 @@
 package city
 
-type CellType int
+type Cell int
 
 const (
-	// Dirt, being the zero CellType value, is the default value of a newly allocated cell.
-	Dirt CellType = 0
+	// Dirt, being the zero Cell value, is the default value of a newly allocated cell.
+	Dirt Cell = 0
 
 	Road      = 100
 	PowerLine = 101
@@ -15,27 +15,3 @@ const (
 
 	PowerPlant = 300
 )
-
-type Cell struct {
-	Typ CellType
-}
-
-func NewDirt() Cell {
-	return Cell{Typ: Dirt}
-}
-
-func NewHouse() Cell {
-	return Cell{Typ: House}
-}
-
-func NewRoad() Cell {
-	return Cell{Typ: Road}
-}
-
-func NewFarm() Cell {
-	return Cell{Typ: Farm}
-}
-
-func NewPowerPlant() Cell {
-	return Cell{Typ: PowerPlant}
-}

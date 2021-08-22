@@ -33,7 +33,7 @@ func (r *CityRenderer) Render() [][]string {
 			intensity := fmt.Sprintf("%02x", temp255)
 			chr := "."
 			color := ""
-			switch cell.Typ {
+			switch cell {
 			case city.House:
 				chr = "■"
 				color = intensity + "0000"

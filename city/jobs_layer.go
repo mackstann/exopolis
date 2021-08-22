@@ -38,7 +38,7 @@ func NewJobsLayer(city *City) *JobsLayer {
 			return 0, false
 		}
 		log.Printf("temperature getter %f", j.Grid[y][x])
-		switch city.Grid[y][x].Typ {
+		switch city.Grid[y][x] {
 		case Farm:
 			return 0.1, true
 		case PowerPlant:
@@ -50,7 +50,7 @@ func NewJobsLayer(city *City) *JobsLayer {
 		if y < 0 || y >= len(j.Grid) || x < 0 || x >= len(j.Grid[0]) {
 			log.Panicf("setTemperature: out of bounds: (%d,%d)", x, y)
 		}
-		if city.Grid[y][x].Typ != Farm && city.Grid[y][x].Typ != PowerPlant {
+		if city.Grid[y][x] != Farm && city.Grid[y][x] != PowerPlant {
 			j.Grid[y][x] = val
 		}
 	}
@@ -59,7 +59,7 @@ func NewJobsLayer(city *City) *JobsLayer {
 			return 0, false
 		}
 
-		switch city.Grid[y][x].Typ {
+		switch city.Grid[y][x] {
 		case Dirt:
 			return dirtConductivity, true
 		case Road:
