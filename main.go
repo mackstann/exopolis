@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -27,12 +29,18 @@ import (
  */
 
 func main() {
-	f, err := os.OpenFile("exopolis.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-	if err != nil {
-		log.Fatalf("error opening log file: %v", err)
+	logEnabled := flag.Bool("log", false, "")
+	flag.Parse()
+	if logEnabled != nil && *logEnabled {
+		f, err := os.OpenFile("exopolis.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+		if err != nil {
+			log.Fatalf("error opening log file: %v", err)
+		}
+		defer f.Close()
+		log.SetOutput(f)
+	} else {
+		log.SetOutput(ioutil.Discard)
 	}
-	defer f.Close()
-	log.SetOutput(f)
 
 	const size = 20
 	city := cityDomain.NewCity(size)
