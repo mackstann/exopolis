@@ -1,12 +1,26 @@
 package adapters
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/mackstann/exopolis/city"
 
+	"github.com/lucasb-eyer/go-colorful"
 	"github.com/muesli/termenv"
+)
+
+const (
+	// wong color palette
+	black  = "#000000"
+	orange = "#E69F00"
+	aqua   = "#56B4E9"
+	green  = "#009E73"
+	yellow = "#F0E442"
+	blue   = "#0072B2"
+	red    = "#D55E00"
+	pink   = "#CC79A7"
+	// supplemental
+	grey = "#aaaaaa"
 )
 
 type CityRenderer struct {
@@ -24,41 +38,42 @@ func NewCityRenderer(c *city.City, jobs *city.JobsLayer) *CityRenderer {
 func (r *CityRenderer) Render() [][]string {
 	c := *r.city
 	rows := make([][]string, 0, len(c.Grid))
+	p := termenv.ColorProfile()
 	for y, row := range c.Grid {
 		rowOutput := make([]string, 0, len(c.Grid[y]))
 		for x, cell := range row {
 			log.Printf("render %d %d", x, y)
 			log.Printf("r.jobs %v", r.jobs)
-			temp255 := int(r.jobs.Grid[y][x] * 255.0)
-			intensity := fmt.Sprintf("%02x", temp255)
 			chr := "."
 			color := ""
 			switch cell {
 			case city.ResidentialZone:
 				chr = "■"
-				color = intensity + "4444"
+				color = blue
 			case city.House:
 				chr = "■"
-				color = intensity + "0000"
+				color = aqua
 			case city.Farm:
 				chr = "▤"
-				color = "00" + intensity + "00"
+				color = green
 			case city.Road:
 				chr = "▪"
-				color = intensity + intensity + intensity
+				color = grey
 			case city.PowerPlant:
 				chr = "p"
-				color = "ffff00"
+				color = yellow
 			case city.Dirt:
 				chr = "░"
-				color = "0000" + intensity
+				color = yellow
 			}
-			p := termenv.ColorProfile()
-			if intensity != "" && chr != " " && len(color) == 6 {
-				rowOutput = append(rowOutput, termenv.String(chr).Foreground(p.Color("#"+color)).String())
-			} else {
-				rowOutput = append(rowOutput, chr)
+			c1, err := colorful.Hex(color)
+			if err != nil {
+				log.Fatal(err)
 			}
+			h, c, l := c1.Hcl()
+			l = r.jobs.Grid[y][x]
+			c2 := colorful.Hcl(h, c, l).Clamped()
+			rowOutput = append(rowOutput, termenv.String(chr).Foreground(p.Color(c2.Hex())).String())
 		}
 		rows = append(rows, rowOutput)
 	}
