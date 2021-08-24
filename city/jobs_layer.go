@@ -15,7 +15,7 @@ type JobsLayer struct {
 type JobsGrid [][]float64
 
 const (
-	dirtConductivity       float64 = 0.1
+	dirtConductivity       float64 = 0.01
 	roadConductivity               = 0.999
 	powerPlantConductivity         = 0.9
 	defaultConductivity            = 0.0
