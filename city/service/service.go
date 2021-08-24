@@ -58,13 +58,13 @@ func (a *CityService) StepCell(x, y int) {
 	// needs to know about zoning AND cells...
 	// it's a separate thing..? implemented by the city
 	if cell == city.ResidentialZone &&
-		a.jobs.Grid[y][x] > 0.1 {
+		a.jobs.Grid[y][x] > 0.3 {
 		log.Printf("grow")
 		if occasionally() {
 			row[x] = city.House
 		}
 	} else if cell == city.House &&
-		a.jobs.Grid[y][x] <= 0.1 {
+		a.jobs.Grid[y][x] <= 0.3 {
 		if occasionally() {
 			log.Printf("ungrow")
 			row[x] = city.ResidentialZone

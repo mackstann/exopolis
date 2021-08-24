@@ -57,7 +57,7 @@ func NewJobsLayer(city *City) *JobsLayer {
 		}
 
 		switch city.Grid[y][x] {
-		case Dirt, ResidentialZone:
+		case Dirt, ResidentialZone, House:
 			return dirtConductivity, true
 		case Road:
 			return roadConductivity, true

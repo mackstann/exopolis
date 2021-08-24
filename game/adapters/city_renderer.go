@@ -52,7 +52,7 @@ func (r *CityRenderer) Render() [][]string {
 				color = blue
 			case city.House:
 				chr = "■"
-				color = aqua
+				color = pink
 			case city.Farm:
 				chr = "▤"
 				color = green
