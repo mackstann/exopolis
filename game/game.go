@@ -13,6 +13,8 @@ const (
 	CursorLeft
 	CursorRight
 	BuildResidential
+	BuildRoad
+	BuildPowerPlant
 )
 
 type Game struct {
@@ -24,6 +26,8 @@ type Game struct {
 
 type BuildPort interface {
 	BuildResidential(x, y int)
+	BuildRoad(x, y int)
+	BuildPowerPlant(x, y int)
 }
 
 type ViewPort interface {
@@ -62,6 +66,10 @@ func (g *Game) HandleInput(ev InputEvent) {
 		}
 	case BuildResidential:
 		g.build.BuildResidential(g.cursorX, g.cursorY)
+	case BuildRoad:
+		g.build.BuildRoad(g.cursorX, g.cursorY)
+	case BuildPowerPlant:
+		g.build.BuildPowerPlant(g.cursorX, g.cursorY)
 	}
 	// TODO: a game renderer that composites this on top...
 	// except... can't use background as cursor if we composite like that

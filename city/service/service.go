@@ -39,6 +39,14 @@ func (a *CityService) BuildResidential(x, y int) {
 	a.city.Grid[y][x] = city.ResidentialZone
 }
 
+func (a *CityService) BuildRoad(x, y int) {
+	a.city.Grid[y][x] = city.Road
+}
+
+func (a *CityService) BuildPowerPlant(x, y int) {
+	a.city.Grid[y][x] = city.PowerPlant
+}
+
 func occasionally() bool {
 	return rand.Float64() < 0.001
 }

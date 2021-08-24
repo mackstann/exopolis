@@ -84,7 +84,6 @@ func (a *TerminalAdapter) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 			a.inputEvents <- game.QuitEvent
 			return a, nil
 		case "h":
-			log.Println("input h")
 			a.inputEvents <- game.CursorLeft
 			return a, nil
 		case "j":
@@ -98,6 +97,12 @@ func (a *TerminalAdapter) Update(message tea.Msg) (tea.Model, tea.Cmd) {
 			return a, nil
 		case "r":
 			a.inputEvents <- game.BuildResidential
+			return a, nil
+		case "p":
+			a.inputEvents <- game.BuildPowerPlant
+			return a, nil
+		case "d":
+			a.inputEvents <- game.BuildRoad
 			return a, nil
 		}
 	case quitRequest:
