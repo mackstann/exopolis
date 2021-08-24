@@ -38,21 +38,18 @@ func NewJobsLayer(city *City) *JobsLayer {
 			return 0, false
 		}
 		log.Printf("temperature getter %f", j.Grid[y][x])
-		switch city.Grid[y][x] {
-		case Farm:
-			return 0.1, true
-		case PowerPlant:
-			return 1, true
-		}
 		return j.Grid[y][x], true
 	}
 	setTemperature := func(x int, y int, val float64) {
 		if y < 0 || y >= len(j.Grid) || x < 0 || x >= len(j.Grid[0]) {
 			log.Panicf("setTemperature: out of bounds: (%d,%d)", x, y)
 		}
-		if city.Grid[y][x] != Farm && city.Grid[y][x] != PowerPlant {
-			j.Grid[y][x] = val
+		if city.Grid[y][x] == Farm {
+			val = 0.1
+		} else if city.Grid[y][x] == PowerPlant {
+			val = 1
 		}
+		j.Grid[y][x] = val
 	}
 	getConductivity := func(x int, y int) (float64, bool) {
 		if y < 0 || y >= len(j.Grid) || x < 0 || x >= len(j.Grid[0]) {
