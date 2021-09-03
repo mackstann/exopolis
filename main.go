@@ -60,12 +60,9 @@ func main() {
 	for {
 		t := time.Now()
 		for _, ev := range terminal.GetInputEventsNonBlocking() {
-			if ev == game.QuitEvent {
-				// TODO: move into game
-				terminal.Shutdown()
+			g.HandleInput(ev)
+			if g.Done() {
 				return
-			} else {
-				g.HandleInput(ev)
 			}
 		}
 		tickDelta := t.Sub(lastTick)
