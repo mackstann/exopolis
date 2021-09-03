@@ -5,20 +5,33 @@ import (
 	"math/rand"
 
 	"github.com/mackstann/exopolis/city"
+	"github.com/mackstann/exopolis/city/adapters"
 )
 
 type CityService struct {
-	city   *city.City
-	jobs   *city.JobsLayer
-	mapgen *city.MapGenerator
+	city     *city.City
+	jobs     *city.JobsLayer
+	mapgen   *city.MapGenerator
+	renderer RendererPort
 }
 
-func NewCityService(c *city.City, jobs *city.JobsLayer, mapgen *city.MapGenerator) *CityService {
+type RendererPort interface {
+	Render() [][]string
+}
+
+func NewCityService(size int) *CityService {
+	c := city.NewCity(size)
+	jobs := city.NewJobsLayer(c)
 	return &CityService{
-		city:   c,
-		jobs:   jobs,
-		mapgen: mapgen,
+		city:     c,
+		jobs:     jobs,
+		mapgen:   city.NewMapGenerator(c),
+		renderer: adapters.NewCityRenderer(c, jobs),
 	}
+}
+
+func (a *CityService) Render() [][]string {
+	return a.renderer.Render()
 }
 
 func (a *CityService) Step() {

@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	cityDomain "github.com/mackstann/exopolis/city"
 	cityService "github.com/mackstann/exopolis/city/service"
 	"github.com/mackstann/exopolis/game"
 	gameAdapters "github.com/mackstann/exopolis/game/adapters"
@@ -43,15 +42,16 @@ func main() {
 	}
 
 	const size = 20
-	city := cityDomain.NewCity(size)
-	jobs := cityDomain.NewJobsLayer(city)
 
-	cityService := cityService.NewCityService(city, jobs, cityDomain.NewMapGenerator(city))
+	cityService := cityService.NewCityService(size)
+
+	// TODO game factory func
 	terminal := gameAdapters.NewTerminalAdapter()
-	renderer := gameAdapters.NewCityRenderer(city, jobs)
 	g := game.NewGame(cityService, terminal)
 
+	// TODO game should call when starting
 	cityService.GenerateMap()
+
 	log.Println("game Run loop")
 
 	frameInterval := time.Duration(time.Second / 30.0)
@@ -77,7 +77,7 @@ func main() {
 			// TODO: give the game engine its own clock, independent of rendering
 			cityService.Step()
 		}
-		text := renderer.Render()
+		text := cityService.Render()
 		// TODO: for other UI elements, composite multiple layers of text.
 		terminal.UpdateCity(text)
 		terminal.Redraw()
