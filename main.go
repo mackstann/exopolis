@@ -74,7 +74,6 @@ func main() {
 			lastTick = time.Now()
 		}
 		for i := 0; i < 1; i++ {
-			// TODO: give the game engine its own clock, independent of rendering
 			cityService.Step()
 		}
 		text := cityService.Render()
