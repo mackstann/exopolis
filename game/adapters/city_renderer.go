@@ -2,7 +2,6 @@ package adapters
 
 import (
 	"log"
-	"math/rand"
 
 	"github.com/mackstann/exopolis/city"
 
@@ -49,10 +48,10 @@ func (r *CityRenderer) Render() [][]string {
 			color := ""
 			switch cell {
 			case city.ResidentialZone:
-				chr = "▀"
+				chr = "▓"
 				color = blue
 			case city.House:
-				chr = "▄"
+				chr = "▓"
 				color = pink
 			case city.Farm:
 				chr = "▤"
@@ -72,11 +71,7 @@ func (r *CityRenderer) Render() [][]string {
 				log.Fatal(err)
 			}
 			h, c, l := c1.Hcl()
-			if cell == city.Dirt {
-				l = 0.5 + (.125 - rand.Float64()/4)
-			} else {
-				l = r.jobs.Grid[y][x]
-			}
+			l = r.jobs.Grid[y][x]
 			c2 := colorful.Hcl(h, c, l).Clamped()
 			rowOutput = append(rowOutput, termenv.String(chr).Foreground(p.Color(c2.Hex())).String())
 		}
